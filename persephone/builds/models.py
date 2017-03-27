@@ -5,12 +5,16 @@ from github.MainClass import Github
 
 class Project(models.Model):
     name = models.CharField(max_length=128)
-    github_repo = models.CharField(max_length=128)
+    github_repo_name = models.CharField(max_length=128)
     github_api_key = models.CharField(max_length=128)
 
     @cached_property
     def github(self):
         return Github(login_or_token=self.github_api_key)
+
+    @cached_property
+    def github_repo(self):
+        return self.github.get_repo(self.github_repo_name)
 
 
 class Build(models.Model):
@@ -33,6 +37,10 @@ class Build(models.Model):
     branch_name = models.CharField(max_length=128, blank=True, null=True)
     pull_request_id = models.CharField(max_length=16, blank=True, null=True)
     commit_hash = models.CharField(max_length=64)
+
+    @cached_property
+    def github_commit(self):
+        return self.project.github_repo_name.commit()
 
     class Meta:
         unique_together = (

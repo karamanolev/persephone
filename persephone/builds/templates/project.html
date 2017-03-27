@@ -1,0 +1,17 @@
+{% extends 'page.html' %}
+
+{% block container %}
+    {{ block.super }}
+
+    <h3>Project {{ project.name }}</h3>
+    <h4>GitHub: {{ project.github_repo_name }}</h4>
+
+    <table>
+        {% for build in project.builds.all %}
+            <tr>
+                <td>{{ build.get_state_display }}</td>
+                <td>{{ build.commit_hash }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

@@ -15,7 +15,10 @@ def index(request):
 
 
 def project(request, project_id):
-    pass
+    data = {
+        'project': Project.objects.get(id=project_id),
+    }
+    return render(request, 'project.html', data)
 
 
 class ProjectCreate(CreateView):
