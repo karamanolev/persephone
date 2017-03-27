@@ -1,0 +1,90 @@
+{% extends 'page.html' %}
+
+{% block container %}
+    {{ block.super }}
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="well">
+                <a href="{% url 'project' build.project_id %}">Back to project</a><br>
+                <br>
+                Project: {{ build.project.name }}<br>
+                State: {{ build.get_state_display }}<br>
+                Build #: {{ build.build_number }}<br>
+                Started: {{ build.date_started }}<br>
+                Branch: {{ build.branch_name }}<br>
+                Commit: {{ build.commit_hash }}<br>
+                Baseline:
+                {% if build.parent %}
+                    <a href="{% url 'build' build.parent.project_id build.parent.id %}">
+                        {{ build.parent.branch_name }} / {{ build.commit_hash }}
+                        ({{ build.parent.date_started }})
+                    </a>
+                {% else %}
+                    no baseline
+                {% endif %}
+                <br>
+
+                <form action="{% url 'build_delete' build.project_id build.build_number %}"
+                      method="post">
+                    {% csrf_token %}
+                    <button>Delete</button>
+                </form>
+
+                {% if build.state == build.STATE_PENDING_REVIEW or build.state == build.STATE_REJECTED %}
+                    <form action="{% url 'build_approve' build.project_id build.build_number %}"
+                          method="post">
+                        {% csrf_token %}
+                        <button>Approve</button>
+                    </form>
+                {% endif %}
+                {% if build.state == build.STATE_PENDING_REVIEW or build.state == build.STATE_APPROVED %}
+                    <form action="{% url 'build_reject' build.project_id build.build_number %}"
+                          method="post">
+                        {% csrf_token %}
+                        <button>Reject</button>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {% for screenshot in build.screenshots.all %}
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-default panel-diff">
+                    <div class="panel-heading">
+                        {{ screenshot.name }} ({{ screenshot.get_state_display }})
+                    </div>
+                    <div class="panel-body">
+                        <div class="image image-parent">
+                            {% if screenshot.parent %}
+                                {% url 'screenshot_image' build.parent.project_id build.parent.build_number screenshot.parent.name as image %}
+                                <img src="{{ image }}">
+                            {% endif %}
+                        </div>
+                        <div class="image image-diff">
+                            {% if screenshot.image_diff %}
+                                {% url 'screenshot_image_diff' build.project_id build.build_number screenshot.name as image %}
+                                <img src="{{ image }}">
+                            {% endif %}
+                        </div>
+                        <div class="image image-current">
+                            {% url 'screenshot_image' build.project_id build.build_number screenshot.name as image %}
+                            <img src="{{ image }}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
+    <script type="text/javascript">
+        $(function() {
+            $('.panel-body .image img').elevateZoom({
+                zoomType: 'inner',
+                cursor: 'crosshair'
+            });
+        })
+    </script>
+{% endblock %}

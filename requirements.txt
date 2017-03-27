@@ -1,0 +1,8 @@
+Django==1.10.6
+django-widget-tweaks==1.4.1
+Wand==0.4.4
+djangorestframework==3.6.2
+PyGithub==1.33
+celery==4.0.2
+Pillow==4.0.0
+requests==2.13.0

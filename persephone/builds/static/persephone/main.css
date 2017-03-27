@@ -1,0 +1,14 @@
+.panel-diff .panel-body {
+    position: relative;
+}
+
+.panel-diff .image {
+    width: calc(33.3% - 3px);
+    display: inline-block;
+    position: relative;
+}
+
+.panel-diff .image > img {
+    width: 100%;
+    border: 1px solid black;
+}

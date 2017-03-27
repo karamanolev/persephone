@@ -5,12 +5,30 @@
 
     <h3>Project {{ project.name }}</h3>
     <h4>GitHub: {{ project.github_repo_name }}</h4>
+    <a href="{% url 'project_update' project.id %}">Edit</a>
+    <form action="{% url 'project_delete' project.id %}" method="post">
+        {% csrf_token %}
+        <button>Delete</button>
+    </form>
 
-    <table>
+    <table class="table table-bordered">
         {% for build in project.builds.all %}
             <tr>
+                <td>#{{ build.build_number }}</td>
                 <td>{{ build.get_state_display }}</td>
-                <td>{{ build.commit_hash }}</td>
+                <td>{{ build.branch_name }}</td>
+                <td>
+                    <a href="{% url 'build' build.project_id build.build_number %}">
+                        {{ build.commit_hash }}
+                    </a>
+                </td>
+                <td>
+                    <form action="{% url 'build_delete' build.project_id build.build_number %}"
+                          method="post">
+                        {% csrf_token %}
+                        <button>Delete</button>
+                    </form>
+                </td>
             </tr>
         {% endfor %}
     </table>
