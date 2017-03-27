@@ -1,5 +1,18 @@
 {% extends 'base.html' %}
 
 {% block container %}
-    {{ form.name }}
+    <form method="post">
+        {% csrf_token %}
+        {{ form.errors }}
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="input-group">
+                    <span class="input-group-btn">
+                        <button class="btn btn-default" type="submit">Go!</button>
+                     </span>
+                    {{ form.name }}
+                </div>
+            </div>
+        </div>
+    </form>
 {% endblock %}

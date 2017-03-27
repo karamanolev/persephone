@@ -14,10 +14,12 @@
                     </div>
                     <div class="form-group">
                         {{ form.password.label_tag }}
-                        {% render_field form.password class+="form-control"  %}
+                        {% render_field form.password class+="form-control" %}
                     </div>
                     {% if form.errors %}
-                        <p class="bg-danger">Your username and password didn't match. Please try again.</p>
+                        <p class="bg-danger" style="padding: 10px;">
+                            Your username and password didn't match. Please try again.
+                        </p>
                     {% endif %}
                     <button type="submit" class="btn btn-primary">Log in</button>
                 </form>
