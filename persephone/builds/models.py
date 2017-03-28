@@ -98,14 +98,17 @@ class Build(models.Model):
     def find_parent(self):
         if self.pull_request_id:
             try:
-                return Build.objects.get(commit_hash=self.github_pull_request.base.sha)
+                return Build.objects.filter(
+                    commit_hash=self.github_pull_request.base.sha,
+                    date_finished__isnull=False,
+                ).order_by('-date_started').last()
             except Build.DoesNotExist:
                 pass
         builds = self.project.builds.filter(
             Q(state=self.STATE_APPROVED) & (
                 Q(branch_name=None) | Q(branch_name__in=['', 'master', 'origin/master'])),
         )
-        return builds.order_by('-date_started').first()
+        return builds.filter(date_finished__isnull=False).order_by('-date_started').first()
 
     def finish(self):
         screenshots = {s.name: s for s in self.screenshots.all()}
