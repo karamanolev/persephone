@@ -6,7 +6,25 @@
     <div class="row">
         <div class="col-md-12">
             <div class="well">
-                <a href="{% url 'builds:project' build.project_id %}">Back to project</a><br>
+                <div class="pull-right">
+                    <a href="{% url 'builds:project' build.project_id %}" class="btn btn-primary">
+                        View Project
+                    </a>
+                    {% if build.state == build.STATE_PENDING_REVIEW or build.state == build.STATE_REJECTED %}
+                        <form action="{% url 'builds:build_approve' build.project_id build.id %}"
+                              method="post" class="form-display-inline">
+                            {% csrf_token %}
+                            <button class="btn btn-success">Approve</button>
+                        </form>
+                    {% endif %}
+                    {% if build.state == build.STATE_PENDING_REVIEW or build.state == build.STATE_APPROVED %}
+                        <form action="{% url 'builds:build_reject' build.project_id build.id %}"
+                              method="post" class="form-display-inline">
+                            {% csrf_token %}
+                            <button class="btn btn-danger">Reject</button>
+                        </form>
+                    {% endif %}
+                </div>
                 <br>
                 Project: {{ build.project.name }}<br>
                 Build ID: {{ build.id }}<br>
@@ -32,21 +50,6 @@
                     {% csrf_token %}
                     <button>Delete</button>
                 </form>
-
-                {% if build.state == build.STATE_PENDING_REVIEW or build.state == build.STATE_REJECTED %}
-                    <form action="{% url 'builds:build_approve' build.project_id build.id %}"
-                          method="post">
-                        {% csrf_token %}
-                        <button>Approve</button>
-                    </form>
-                {% endif %}
-                {% if build.state == build.STATE_PENDING_REVIEW or build.state == build.STATE_APPROVED %}
-                    <form action="{% url 'builds:build_reject' build.project_id build.id %}"
-                          method="post">
-                        {% csrf_token %}
-                        <button>Reject</button>
-                    </form>
-                {% endif %}
             </div>
         </div>
     </div>

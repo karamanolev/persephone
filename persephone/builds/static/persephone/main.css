@@ -1,3 +1,7 @@
+.form-display-inline {
+    display: inline;
+}
+
 .collapsed-screenshot {
     display: none;
 }
