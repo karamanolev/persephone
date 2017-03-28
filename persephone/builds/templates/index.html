@@ -6,13 +6,17 @@
     <div class="row">
         <div class="col-md-12">
             <div class="well">
-                {% for project in projects %}
-                    <a href="{% url 'builds:project' project.id %}">{{ project.name }}</a><br>
-                {% empty %}
-                    You have no projects.
-                {% endfor %}
-
-                <a href="{% url 'builds:project_create' %}">Create Project</a>
+                <div class="row">
+                    <div class="col-xs-6 col-md-3">
+                            {% for project in projects %}
+                                <a href="{% url 'builds:project' project.id %}" class="thumbnail">{{ project.name }}</a><br>
+                            {% empty %}
+                                You have no projects.
+                            {% endfor %}
+                            <a href="{% url 'builds:project_create' %}">Create Project</a>
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
