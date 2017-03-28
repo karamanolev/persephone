@@ -53,6 +53,8 @@ class Build(models.Model):
     date_started = models.DateTimeField(auto_now_add=True)
     date_finished = models.DateTimeField(null=True)
     date_approved = models.DateTimeField(null=True)
+    date_rejected = models.DateTimeField(null=True)
+    reviewed_by = models.CharField(max_length=128, blank=True, null=True)
     branch_name = models.CharField(max_length=128, blank=True, null=True)
     pull_request_id = models.CharField(max_length=16, blank=True, null=True)
     commit_hash = models.CharField(max_length=64, db_index=True)

@@ -4,6 +4,7 @@ from django.db import transaction
 from django.http.response import HttpResponseForbidden, HttpResponse
 from django.shortcuts import render, redirect
 from django.urls.base import reverse_lazy
+from django.utils import timezone
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from rest_framework import generics, permissions
 from rest_framework.response import Response
@@ -77,7 +78,15 @@ def build_action(action):
                                Build.STATE_APPROVED,
                                Build.STATE_REJECTED]:
             return HttpResponseForbidden()
-        build.state = Build.STATE_APPROVED if action == 'approve' else Build.STATE_REJECTED
+        if action == 'approve':
+            build.state = Build.STATE_APPROVED
+            build.date_approved = timezone.now()
+        elif action == 'reject':
+            build.state = Build.STATE_REJECTED
+            build.date_rejected = timezone.now()
+        else:
+            raise Exception('Unknown action {}'.format(action))
+        build.reviewed_by = request.user.username
         build.save()
         build.update_github_status()
         return redirect('build', project_id, build_id)

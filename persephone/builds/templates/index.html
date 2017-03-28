@@ -7,12 +7,12 @@
         <div class="col-md-12">
             <div class="well">
                 {% for project in projects %}
-                    <a href="{% url 'project' project.id %}">{{ project.name }}</a><br>
+                    <a href="{% url 'builds:project' project.id %}">{{ project.name }}</a><br>
                 {% empty %}
                     You have no projects.
                 {% endfor %}
 
-                <a href="{% url 'project_create' %}">Create Project</a>
+                <a href="{% url 'builds:project_create' %}">Create Project</a>
             </div>
         </div>
     </div>

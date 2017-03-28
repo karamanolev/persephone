@@ -6,7 +6,7 @@
     <div class="row">
         <div class="col-md-12">
             <div class="well">
-                <a href="{% url 'project' build.project_id %}">Back to project</a><br>
+                <a href="{% url 'builds:project' build.project_id %}">Back to project</a><br>
                 <br>
                 Project: {{ build.project.name }}<br>
                 Build ID: {{ build.id }}<br>
@@ -17,7 +17,7 @@
                 Commit: {{ build.commit_hash }}<br>
                 Baseline:
                 {% if build.parent %}
-                    <a href="{% url 'build' build.parent.project_id build.parent.id %}">
+                    <a href="{% url 'builds:build' build.parent.project_id build.parent.id %}">
                         {{ build.parent.branch_name }} / {{ build.commit_hash }}
                         ({{ build.parent.date_started }})
                     </a>
@@ -26,21 +26,21 @@
                 {% endif %}
                 <br>
 
-                <form action="{% url 'build_delete' build.project_id build.id %}"
+                <form action="{% url 'builds:build_delete' build.project_id build.id %}"
                       method="post">
                     {% csrf_token %}
                     <button>Delete</button>
                 </form>
 
                 {% if build.state == build.STATE_PENDING_REVIEW or build.state == build.STATE_REJECTED %}
-                    <form action="{% url 'build_approve' build.project_id build.id %}"
+                    <form action="{% url 'builds:build_approve' build.project_id build.id %}"
                           method="post">
                         {% csrf_token %}
                         <button>Approve</button>
                     </form>
                 {% endif %}
                 {% if build.state == build.STATE_PENDING_REVIEW or build.state == build.STATE_APPROVED %}
-                    <form action="{% url 'build_reject' build.project_id build.id %}"
+                    <form action="{% url 'builds:build_reject' build.project_id build.id %}"
                           method="post">
                         {% csrf_token %}
                         <button>Reject</button>
@@ -60,18 +60,18 @@
                     <div class="panel-body">
                         <div class="image image-parent">
                             {% if screenshot.parent %}
-                                {% url 'screenshot_image' build.parent.project_id build.parent.id screenshot.parent.name as image %}
+                                {% url 'builds:screenshot_image' build.parent.project_id build.parent.id screenshot.parent.name as image %}
                                 <img src="{{ image }}">
                             {% endif %}
                         </div>
                         <div class="image image-diff">
                             {% if screenshot.image_diff %}
-                                {% url 'screenshot_image_diff' build.project_id build.id screenshot.name as image %}
+                                {% url 'builds:screenshot_image_diff' build.project_id build.id screenshot.name as image %}
                                 <img src="{{ image }}">
                             {% endif %}
                         </div>
                         <div class="image image-current">
-                            {% url 'screenshot_image' build.project_id build.id screenshot.name as image %}
+                            {% url 'builds:screenshot_image' build.project_id build.id screenshot.name as image %}
                             <img src="{{ image }}">
                         </div>
                     </div>
