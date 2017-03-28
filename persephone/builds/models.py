@@ -91,7 +91,7 @@ class Build(models.Model):
         }
         if self.project.public_endpoint:
             url = self.project.build_absolute_uri(reverse(
-                'build', args=(self.project_id, self.id)))
+                'builds:build', args=(self.project_id, self.id)))
             kwargs['target_url'] = url
         self.github_commit.create_status(**kwargs)
 
