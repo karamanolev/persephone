@@ -14,16 +14,21 @@
     <table class="table table-bordered">
         {% for build in project.builds.all %}
             <tr>
-                <td>#{{ build.build_number }}</td>
+                <td>
+                    {{ build.id }}
+                    {% if build.original_build_number %}
+                        (originally #{{ build.original_build_number }})
+                    {% endif %}
+                </td>
                 <td>{{ build.get_state_display }}</td>
                 <td>{{ build.branch_name }}</td>
                 <td>
-                    <a href="{% url 'build' build.project_id build.build_number %}">
+                    <a href="{% url 'build' build.project_id build.id %}">
                         {{ build.commit_hash }}
                     </a>
                 </td>
                 <td>
-                    <form action="{% url 'build_delete' build.project_id build.build_number %}"
+                    <form action="{% url 'build_delete' build.project_id build.id %}"
                           method="post">
                         {% csrf_token %}
                         <button>Delete</button>

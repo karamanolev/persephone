@@ -48,7 +48,8 @@ class Build(models.Model):
     project = models.ForeignKey(Project, related_name='builds')
     parent = models.ForeignKey('self', null=True, related_name='children')
     state = models.IntegerField(choices=STATE_CHOICES, default=STATE_INITIALIZING)
-    build_number = models.CharField(max_length=64)
+    original_build_number = models.CharField(max_length=64, blank=True, null=True)
+    original_build_url = models.CharField(max_length=256, blank=True, null=True)
     date_started = models.DateTimeField(auto_now_add=True)
     date_finished = models.DateTimeField(null=True)
     date_approved = models.DateTimeField(null=True)
@@ -88,7 +89,7 @@ class Build(models.Model):
         }
         if self.project.public_endpoint:
             url = self.project.build_absolute_uri(reverse(
-                'build', args=(self.project_id, self.build_number)))
+                'build', args=(self.project_id, self.id)))
             kwargs['target_url'] = url
         self.github_commit.create_status(**kwargs)
 
@@ -102,7 +103,7 @@ class Build(models.Model):
             Q(state=self.STATE_APPROVED) & (
                 Q(branch_name=None) | Q(branch_name__in=['', 'master', 'origin/master'])),
         )
-        return builds.order_by('-build_number').first()
+        return builds.order_by('-date_started').first()
 
     def finish(self):
         screenshots = {s.name: s for s in self.screenshots.all()}
@@ -124,9 +125,6 @@ class Build(models.Model):
 
     class Meta:
         ordering = ('-date_started',)
-        unique_together = (
-            ('project', 'build_number'),
-        )
 
 
 class Screenshot(models.Model):

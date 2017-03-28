@@ -9,8 +9,9 @@
                 <a href="{% url 'project' build.project_id %}">Back to project</a><br>
                 <br>
                 Project: {{ build.project.name }}<br>
+                Build ID: {{ build.id }}<br>
                 State: {{ build.get_state_display }}<br>
-                Build #: {{ build.build_number }}<br>
+                Original Build #: {{ build.original_build_number }}
                 Started: {{ build.date_started }}<br>
                 Branch: {{ build.branch_name }}<br>
                 Commit: {{ build.commit_hash }}<br>
@@ -25,21 +26,21 @@
                 {% endif %}
                 <br>
 
-                <form action="{% url 'build_delete' build.project_id build.build_number %}"
+                <form action="{% url 'build_delete' build.project_id build.id %}"
                       method="post">
                     {% csrf_token %}
                     <button>Delete</button>
                 </form>
 
                 {% if build.state == build.STATE_PENDING_REVIEW or build.state == build.STATE_REJECTED %}
-                    <form action="{% url 'build_approve' build.project_id build.build_number %}"
+                    <form action="{% url 'build_approve' build.project_id build.id %}"
                           method="post">
                         {% csrf_token %}
                         <button>Approve</button>
                     </form>
                 {% endif %}
                 {% if build.state == build.STATE_PENDING_REVIEW or build.state == build.STATE_APPROVED %}
-                    <form action="{% url 'build_reject' build.project_id build.build_number %}"
+                    <form action="{% url 'build_reject' build.project_id build.id %}"
                           method="post">
                         {% csrf_token %}
                         <button>Reject</button>
@@ -59,18 +60,18 @@
                     <div class="panel-body">
                         <div class="image image-parent">
                             {% if screenshot.parent %}
-                                {% url 'screenshot_image' build.parent.project_id build.parent.build_number screenshot.parent.name as image %}
+                                {% url 'screenshot_image' build.parent.project_id build.parent.id screenshot.parent.name as image %}
                                 <img src="{{ image }}">
                             {% endif %}
                         </div>
                         <div class="image image-diff">
                             {% if screenshot.image_diff %}
-                                {% url 'screenshot_image_diff' build.project_id build.build_number screenshot.name as image %}
+                                {% url 'screenshot_image_diff' build.project_id build.id screenshot.name as image %}
                                 <img src="{{ image }}">
                             {% endif %}
                         </div>
                         <div class="image image-current">
-                            {% url 'screenshot_image' build.project_id build.build_number screenshot.name as image %}
+                            {% url 'screenshot_image' build.project_id build.id screenshot.name as image %}
                             <img src="{{ image }}">
                         </div>
                     </div>
