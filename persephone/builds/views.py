@@ -67,7 +67,7 @@ def build_detail(request, project_id, build_id):
 def build_delete(request, project_id, build_id):
     build = Build.objects.get(project_id=project_id, id=build_id)
     build.delete()
-    return redirect('project', project_id)
+    return redirect('builds:project', project_id)
 
 
 def build_action(action):
@@ -89,7 +89,7 @@ def build_action(action):
         build.reviewed_by = request.user.username
         build.save()
         build.update_github_status()
-        return redirect('build', project_id, build_id)
+        return redirect('builds:build', project_id, build_id)
 
     return _build_status
 
