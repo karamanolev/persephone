@@ -156,6 +156,18 @@ class APIBuildFinish(APIView):
         return Response(BuildSerializer(build).data)
 
 
+class APIBuildFail(APIView):
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def post(self, request, project_id, build_id):
+        build = Build.objects.get(project_id=project_id, id=build_id)
+        if build.state != Build.STATE_RUNNING:
+            return HttpResponseForbidden()
+        build.state = Build.STATE_FAILED
+        build.save()
+        return Response(BuildSerializer(build).data)
+
+
 class APIScreenshots(APIView):
     permission_classes = (permissions.IsAuthenticated,)
 
@@ -164,11 +176,13 @@ class APIScreenshots(APIView):
         if build.state not in [Build.STATE_INITIALIZING, Build.STATE_RUNNING]:
             return HttpResponseForbidden()
         name = request.POST['name']
+
         build.screenshots.filter(name=name).delete()
         screenshot = Screenshot.objects.create(
             build=build,
             name=name,
             image=request.FILES['image'],
+            metadata_json=request.POST.get('metadata'),
         )
         transaction.on_commit(lambda: tasks.process_screenshot(screenshot.id))
         return Response(ScreenshotSerializer(screenshot).data)

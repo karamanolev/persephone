@@ -37,7 +37,7 @@
                 Baseline:
                 {% if build.parent %}
                     <a href="{% url 'builds:build' build.parent.project_id build.parent.id %}">
-                        {{ build.parent.branch_name }} / {{ build.commit_hash }}
+                        {{ build.parent.branch_name }} / {{ build.parent.commit_hash }}
                         ({{ build.parent.date_started }})
                     </a>
                 {% else %}
@@ -59,7 +59,9 @@
             <div class="col-md-12">
                 <div class="panel panel-default panel-diff">
                     <div class="panel-heading">
-                        {{ screenshot.name }} ({{ screenshot.get_state_display }})
+                        {{ screenshot.name }}
+                        ({{ screenshot.get_state_display }}{% if screenshot.image_diff_amount %}
+                        {{ screenshot.image_diff_amount }}{% endif %})
                     </div>
                     <div class="panel-body">
                         <div class="image image-parent">
@@ -75,14 +77,17 @@
                             {% endif %}
                         </div>
                         <div class="image image-current">
-                            {% url 'builds:screenshot_image' build.project_id build.id screenshot.name as image %}
-                            <img src="{{ image }}">
+                            {% if screenshot.image %}
+                                {% url 'builds:screenshot_image' build.project_id build.id screenshot.name as image %}
+                                <img src="{{ image }}">
+                            {% endif %}
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     {% endfor %}
+
     {% if num_matching %}
         <div class="row uncollapse-screenshots">
             <div class="col-md-12">

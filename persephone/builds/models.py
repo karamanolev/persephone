@@ -1,3 +1,4 @@
+import json
 import urllib.parse
 
 from django.core.files.base import ContentFile
@@ -36,6 +37,7 @@ class Build(models.Model):
     STATE_NO_DIFF = 4
     STATE_APPROVED = 5
     STATE_REJECTED = 6
+    STATE_FAILED = 7
     STATE_CHOICES = (
         (STATE_INITIALIZING, 'Initializing'),
         (STATE_RUNNING, 'Running'),
@@ -44,6 +46,7 @@ class Build(models.Model):
         (STATE_NO_DIFF, 'No Diff'),
         (STATE_APPROVED, 'Approved'),
         (STATE_REJECTED, 'Rejected'),
+        (STATE_FAILED, 'Failed'),
     )
 
     project = models.ForeignKey(Project, related_name='builds')
@@ -78,6 +81,7 @@ class Build(models.Model):
                 self.STATE_NO_DIFF: 'success',
                 self.STATE_APPROVED: 'success',
                 self.STATE_REJECTED: 'failure',
+                self.STATE_FAILED: 'error',
             }[self.state],
             'description': {
                 self.STATE_INITIALIZING: 'Build is initializing.',
@@ -87,6 +91,7 @@ class Build(models.Model):
                 self.STATE_NO_DIFF: 'There are no visual differences detected.',
                 self.STATE_APPROVED: 'Visual diff is approved.',
                 self.STATE_REJECTED: 'Visual diff is rejected.',
+                self.STATE_FAILED: 'Build failed.',
             }[self.state],
             'context': 'persephone',
         }
@@ -96,20 +101,22 @@ class Build(models.Model):
             kwargs['target_url'] = url
         self.github_commit.create_status(**kwargs)
 
-    def find_parent(self):
-        if self.pull_request_id:
-            try:
-                return Build.objects.filter(
-                    commit_hash=self.github_pull_request.base.sha,
-                    date_finished__isnull=False,
-                ).order_by('-date_started').last()
-            except Build.DoesNotExist:
-                pass
+    def get_master_baseline(self):
         builds = self.project.builds.filter(
             Q(state=self.STATE_APPROVED) & (
                 Q(branch_name=None) | Q(branch_name__in=['', 'master', 'origin/master'])),
         )
         return builds.filter(date_finished__isnull=False).order_by('-date_started').first()
+
+    def find_parent(self):
+        if self.pull_request_id:
+            pr_build = Build.objects.filter(
+                commit_hash=self.github_pull_request.base.sha,
+                date_finished__isnull=False,
+            ).order_by('-date_started').first()
+            if pr_build is not None:
+                return pr_build
+        return self.get_master_baseline()
 
     def finish(self):
         screenshots = {s.name: s for s in self.screenshots.all()}
@@ -153,9 +160,22 @@ class Screenshot(models.Model):
     parent = models.ForeignKey('self', null=True, related_name='children')
     date_created = models.DateTimeField(auto_now_add=True)
     name = models.CharField(max_length=255)
+    metadata_json = models.TextField(blank=True, null=True)
     image = models.ImageField(upload_to='screenshots/')
     image_diff = models.ImageField(upload_to='screenshot_diffs/', null=True)
     image_diff_amount = models.FloatField(null=True)
+
+    @cached_property
+    def metadata(self):
+        if self.metadata_json:
+            return json.loads(self.metadata_json)
+        return None
+
+    @cached_property
+    def metadata_pretty(self):
+        if self.metadata:
+            return json.dumps(self.metadata, indent=2, ensure_ascii=False)
+        return None
 
     def find_parent(self):
         parent_build = self.build.parent
