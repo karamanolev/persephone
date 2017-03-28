@@ -11,8 +11,9 @@
                 Project: {{ build.project.name }}<br>
                 Build ID: {{ build.id }}<br>
                 State: {{ build.get_state_display }}<br>
-                Original Build #: {{ build.original_build_number }}
+                Original Build #: {{ build.original_build_number }}<br>
                 Started: {{ build.date_started }}<br>
+                Finished: {{ build.date_finished }}<br>
                 Branch: {{ build.branch_name }}<br>
                 Commit: {{ build.commit_hash }}<br>
                 Baseline:
@@ -50,8 +51,8 @@
         </div>
     </div>
 
-    {% for screenshot in build.screenshots.all %}
-        <div class="row">
+    {% for screenshot in screenshots %}
+        <div class="row {% if screenshot.state == screenshot.STATE_MATCHING %}collapsed-screenshot{% endif %}">
             <div class="col-md-12">
                 <div class="panel panel-default panel-diff">
                     <div class="panel-heading">
@@ -79,6 +80,17 @@
             </div>
         </div>
     {% endfor %}
+    {% if num_matching %}
+        <div class="row uncollapse-screenshots">
+            <div class="col-md-12">
+                <div class="well text-center">
+                    <button type="button" class="btn btn-primary">
+                        View {{ num_matching }} collapsed matching screenshots
+                    </button>
+                </div>
+            </div>
+        </div>
+    {% endif %}
 
     <script type="text/javascript">
         $(function() {
@@ -86,6 +98,10 @@
                 zoomType: 'inner',
                 cursor: 'crosshair'
             });
+            $('.uncollapse-screenshots').click(function() {
+                $('.uncollapse-screenshots').hide();
+                $('.collapsed-screenshot').slideDown();
+            })
         })
     </script>
 {% endblock %}

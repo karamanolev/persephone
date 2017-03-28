@@ -1,3 +1,7 @@
+.collapsed-screenshot {
+    display: none;
+}
+
 .panel-diff .panel-body {
     position: relative;
 }

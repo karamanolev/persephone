@@ -59,6 +59,8 @@ def build_detail(request, project_id, build_id):
     sort_screenshots_by_relevance(screenshots)
     data = {
         'build': build,
+        'screenshots': screenshots,
+        'num_matching': sum(1 for s in screenshots if s.state == Screenshot.STATE_MATCHING)
     }
     return render(request, 'build.html', data)
 
