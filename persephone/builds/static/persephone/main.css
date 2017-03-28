@@ -12,3 +12,12 @@
     width: 100%;
     border: 1px solid black;
 }
+
+.project-list .thumbnail {
+    height: 200px;
+    text-decoration: none;
+}
+
+.project-list .thumbnail.add-project {
+    background-color: #dff0d8;
+}

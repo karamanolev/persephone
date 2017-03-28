@@ -6,18 +6,39 @@
     <div class="row">
         <div class="col-md-12">
             <div class="well">
-                <div class="row">
-                    <div class="col-xs-6 col-md-3">
-                            {% for project in projects %}
-                                <a href="{% url 'builds:project' project.id %}" class="thumbnail">{{ project.name }}</a><br>
-                            {% empty %}
-                                You have no projects.
-                            {% endfor %}
-                            <a href="{% url 'builds:project_create' %}">Create Project</a>
+                <div class="row project-list">
+                    {% for project in projects %}
+                        <div class="col-md-3">
+                            <a href="{% url 'builds:project' project.id %}" class="thumbnail">
+                                <div class="caption">
+                                    <h2>{{ project.name }}</h2>
+                                    <h4>
+                                        <strong>GitHub Repo</strong><br>
+                                        {{ project.github_repo_name }}<br>
+                                        <strong>Public URL</strong><br>
+                                        {{ project.public_endpoint }}<br>
+                                    </h4>
+                                </div>
+                            </a>
+                        </div>
+                    {% empty %}
+                        You have no projects.
+                    {% endfor %}
+
+                    <div class="col-md-3">
+                        <a href="{% url 'builds:project_create' %}" class="thumbnail add-project">
+                            <div class="caption">
+                                <h2 class="text-center">Create Project</h2>
+                                <h1 class="text-center">
+                                    <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                                </h1>
+                            </div>
                         </a>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
+    </div>
     </div>
 {% endblock %}
