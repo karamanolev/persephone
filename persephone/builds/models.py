@@ -4,6 +4,7 @@ from django.core.files.base import ContentFile
 from django.db import models
 from django.db.models.query_utils import Q
 from django.urls.base import reverse
+from django.utils import timezone
 from django.utils.functional import cached_property
 from github.MainClass import Github
 from wand.image import Image
@@ -126,6 +127,7 @@ class Build(models.Model):
             self.state = Build.STATE_NO_DIFF
         else:
             self.state = Build.STATE_PENDING_REVIEW
+        self.date_finished = timezone.now()
         self.update_github_status()
 
     class Meta:
