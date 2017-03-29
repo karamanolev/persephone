@@ -29,11 +29,27 @@
                 Project: {{ build.project.name }}<br>
                 Build ID: {{ build.id }}<br>
                 State: {{ build.get_state_display }}<br>
-                Original Build #: {{ build.original_build_number }}<br>
+                Original Build:
+                {% with build.original_build_url as url %}
+                    <a href="{% if url %}{{ url }}{% endif %}">
+                        #{{ build.original_build_number }}
+                    </a>
+                {% endwith %}
+                <br>
                 Started: {{ build.date_started }}<br>
                 Finished: {{ build.date_finished }}<br>
+                Approved: {{ build.date_approved }}<br>
+                Rejected: {{ build.date_rejected }}<br>
+                Reviewed by: {{ build.reviewed_by }}<br>
                 Branch: {{ build.branch_name }}<br>
                 Commit: {{ build.commit_hash }}<br>
+                {% if build.pull_request_id %}
+                    Pull Request:
+                    <a href="https://github.com/{{ build.project.github_repo_name }}/pull/{{ build.pull_request_id }}">
+                        #{{ build.pull_request_id }}
+                    </a>
+                    <br>
+                {% endif %}
                 Baseline:
                 {% if build.parent %}
                     <a href="{% url 'builds:build' build.parent.project_id build.parent.id %}">
