@@ -100,14 +100,18 @@ def build_action(action):
 def screenshot_image(request, project_id, build_id, screenshot_name):
     build = Build.objects.get(project_id=project_id, id=build_id)
     screenshot = build.screenshots.get(name=screenshot_name)
-    return HttpResponse(open(screenshot.image.path, 'rb'))
+    resp = HttpResponse(open(screenshot.image.path, 'rb'), content_type='image/png')
+    resp['Cache-Control'] = 'public, max-age=600'
+    return resp
 
 
 @login_required
 def screenshot_image_diff(request, project_id, build_id, screenshot_name):
     build = Build.objects.get(project_id=project_id, id=build_id)
     screenshot = build.screenshots.get(name=screenshot_name)
-    return HttpResponse(open(screenshot.image_diff.path, 'rb'))
+    resp = HttpResponse(open(screenshot.image_diff.path, 'rb'), content_type='image/png')
+    resp['Cache-Control'] = 'public, max-age=600'
+    return resp
 
 
 class APIProjects(generics.ListCreateAPIView):
