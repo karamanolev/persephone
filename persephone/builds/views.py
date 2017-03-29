@@ -27,10 +27,20 @@ def index(request):
 @login_required
 def project(request, project_id):
     project = Project.objects.get(id=project_id)
+    active_builds = []
+    past_builds = []
+    for build in project.builds.filter(archived=False):
+        if build.state in [Build.STATE_INITIALIZING, Build.STATE_RUNNING, Build.STATE_FINISHING,
+                           Build.STATE_PENDING_REVIEW]:
+            active_builds.append(build)
+        else:
+            past_builds.append(build)
+    archived_builds = project.builds.filter(archived=True)
     data = {
         'project': project,
-        'unarchived_builds': project.builds.filter(archived=False),
-        'archived_builds': project.builds.filter(archived=True),
+        'active_builds': active_builds,
+        'past_builds': past_builds,
+        'archived_builds': archived_builds,
     }
     return render(request, 'project.html', data)
 

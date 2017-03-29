@@ -27,14 +27,23 @@
     <div class="well">
         <h4><strong>Active</strong></h4>
         <table class="table table-bordered">
-            {% for build in unarchived_builds %}
+            {% for build in active_builds %}
                 {% include 'partials/_project_build.html' %}
             {% endfor %}
         </table>
     </div>
 
     <div class="well">
-        <h4><strong>History</strong></h4>
+        <h4><strong>Past</strong></h4>
+        <table class="table table-bordered">
+            {% for build in past_builds %}
+                {% include 'partials/_project_build.html' %}
+            {% endfor %}
+        </table>
+    </div>
+
+    <div class="well">
+        <h4><strong>Archive</strong></h4>
         <table class="table table-bordered">
             {% for build in archived_builds %}
                 {% include 'partials/_project_build.html' %}
