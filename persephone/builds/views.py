@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import transaction
@@ -27,41 +29,38 @@ def index(request):
 @login_required
 def project(request, project_id):
     project = Project.objects.get(id=project_id)
-    active_builds = []
-    past_builds = []
-    for build in project.builds.filter(archived=False):
-        if build.state in [Build.STATE_INITIALIZING, Build.STATE_RUNNING, Build.STATE_FINISHING,
-                           Build.STATE_PENDING_REVIEW]:
-            active_builds.append(build)
-        else:
-            past_builds.append(build)
-    archived_builds = project.builds.filter(archived=True)
+    active_builds = project.builds.filter(
+        archived=False,
+        state__in=[Build.STATE_INITIALIZING, Build.STATE_RUNNING, Build.STATE_FINISHING,
+                   Build.STATE_PENDING_REVIEW],
+    )
+    active_build_ids = active_builds.values_list('id', flat=True)
+    past_builds = project.builds.exclude(id__in=active_build_ids)
     data = {
         'project': project,
         'active_builds': active_builds,
         'past_builds': past_builds,
-        'archived_builds': archived_builds,
     }
     return render(request, 'project.html', data)
 
 
 class ProjectCreate(CreateView, LoginRequiredMixin):
     model = Project
-    success_url = reverse_lazy('index')
+    success_url = reverse_lazy('builds:index')
     template_name = 'project_form.html'
     fields = '__all__'
 
 
 class ProjectUpdate(UpdateView, LoginRequiredMixin):
     model = Project
-    success_url = reverse_lazy('index')
+    success_url = reverse_lazy('builds:index')
     template_name = 'project_form.html'
     fields = '__all__'
 
 
 class ProjectDelete(DeleteView, LoginRequiredMixin):
     model = Project
-    success_url = reverse_lazy('index')
+    success_url = reverse_lazy('builds:index')
     fields = '__all__'
 
 

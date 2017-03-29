@@ -28,7 +28,16 @@
         <h4><strong>Active</strong></h4>
         <table class="table table-bordered">
             {% for build in active_builds %}
-                {% include 'partials/_project_build.html' %}
+                {% with 1 as show_progress_bar %}
+                    {% include 'partials/_project_build.html' %}
+                {% endwith %}
+            {% empty %}
+                <h4>
+                    <small>
+                        You have no currently active builds. When there are builds that are running
+                        or pending review, they will appear here.
+                    </small>
+                </h4>
             {% endfor %}
         </table>
     </div>
@@ -37,15 +46,6 @@
         <h4><strong>Past</strong></h4>
         <table class="table table-bordered">
             {% for build in past_builds %}
-                {% include 'partials/_project_build.html' %}
-            {% endfor %}
-        </table>
-    </div>
-
-    <div class="well">
-        <h4><strong>Archive</strong></h4>
-        <table class="table table-bordered">
-            {% for build in archived_builds %}
                 {% include 'partials/_project_build.html' %}
             {% endfor %}
         </table>

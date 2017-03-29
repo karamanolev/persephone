@@ -1,5 +1,6 @@
 import json
 import urllib.parse
+from collections import OrderedDict
 
 from django.core.files.base import ContentFile
 from django.db import models
@@ -19,8 +20,9 @@ class Project(models.Model):
     github_repo_name = models.CharField(max_length=128)
     github_api_key = models.CharField(max_length=128)
     auto_archive_no_diff_builds = models.BooleanField(default=True)
-    max_master_builds_to_keep = models.IntegerField(default=8)
-    max_branch_builds_to_keep = models.IntegerField(default=8)
+    auto_approve_master_builds = models.BooleanField(default=True)
+    max_master_builds_to_keep = models.IntegerField(default=20)
+    max_branch_builds_to_keep = models.IntegerField(default=20)
 
     @cached_property
     def github(self):
@@ -54,6 +56,8 @@ class Project(models.Model):
 
 
 class Build(models.Model):
+    MASTER_BRANCH_NAMES = ['', 'master', 'origin/master']
+
     STATE_INITIALIZING = 0
     STATE_RUNNING = 1
     STATE_FINISHING = 2
@@ -100,24 +104,24 @@ class Build(models.Model):
     def update_github_status(self):
         kwargs = {
             'state': {
-                self.STATE_INITIALIZING: 'pending',
-                self.STATE_RUNNING: 'pending',
-                self.STATE_FINISHING: 'finishing',
-                self.STATE_PENDING_REVIEW: 'pending',
-                self.STATE_NO_DIFF: 'success',
-                self.STATE_APPROVED: 'success',
-                self.STATE_REJECTED: 'failure',
-                self.STATE_FAILED: 'error',
+                Build.STATE_INITIALIZING: 'pending',
+                Build.STATE_RUNNING: 'pending',
+                Build.STATE_FINISHING: 'finishing',
+                Build.STATE_PENDING_REVIEW: 'pending',
+                Build.STATE_NO_DIFF: 'success',
+                Build.STATE_APPROVED: 'success',
+                Build.STATE_REJECTED: 'failure',
+                Build.STATE_FAILED: 'error',
             }[self.state],
             'description': {
-                self.STATE_INITIALIZING: 'Build is initializing.',
-                self.STATE_RUNNING: 'Build is running.',
-                self.STATE_FINISHING: 'Build is finishing.',
-                self.STATE_PENDING_REVIEW: 'Visual diff is pending review.',
-                self.STATE_NO_DIFF: 'There are no visual differences detected.',
-                self.STATE_APPROVED: 'Visual diff is approved.',
-                self.STATE_REJECTED: 'Visual diff is rejected.',
-                self.STATE_FAILED: 'Build failed.',
+                Build.STATE_INITIALIZING: 'Build is initializing.',
+                Build.STATE_RUNNING: 'Build is running.',
+                Build.STATE_FINISHING: 'Build is finishing.',
+                Build.STATE_PENDING_REVIEW: 'Visual diff is pending review.',
+                Build.STATE_NO_DIFF: 'There are no visual differences detected.',
+                Build.STATE_APPROVED: 'Visual diff is approved.',
+                Build.STATE_REJECTED: 'Visual diff is rejected.',
+                Build.STATE_FAILED: 'Build failed.',
             }[self.state],
             'context': 'persephone',
         }
@@ -129,8 +133,9 @@ class Build(models.Model):
 
     def get_master_baseline(self):
         builds = self.project.builds.filter(
-            Q(state=self.STATE_APPROVED) & (
-                Q(branch_name=None) | Q(branch_name__in=['', 'master', 'origin/master'])),
+            Q(state=self.STATE_APPROVED, archived=False)
+            &
+            (Q(branch_name=None) | Q(branch_name__in=Build.MASTER_BRANCH_NAMES))
         )
         return builds.filter(date_finished__isnull=False).order_by('-date_started').first()
 
@@ -139,10 +144,23 @@ class Build(models.Model):
             pr_build = Build.objects.filter(
                 commit_hash=self.github_pull_request.base.sha,
                 date_finished__isnull=False,
+                archived=False,
             ).order_by('-date_started').first()
             if pr_build is not None:
                 return pr_build
         return self.get_master_baseline()
+
+    def _finish_compute_state(self):
+        is_master = self.branch_name in Build.MASTER_BRANCH_NAMES
+        if is_master and self.project.auto_approve_master_builds:
+            self.state = Build.STATE_APPROVED
+            self.reviewed_by = 'autoapprover'
+            return
+
+        if all(s.state == Screenshot.STATE_MATCHING for s in self.screenshots.all()):
+            self.state = Build.STATE_NO_DIFF
+        else:
+            self.state = Build.STATE_PENDING_REVIEW
 
     def finish(self):
         screenshots = {s.name: s for s in self.screenshots.all()}
@@ -156,12 +174,10 @@ class Build(models.Model):
                         parent=parent_screenshot,
                         name=parent_screenshot.name,
                     )
-        if all(s.state == Screenshot.STATE_MATCHING for s in self.screenshots.all()):
-            self.state = Build.STATE_NO_DIFF
+        self._finish_compute_state()
+        if self.state == Build.STATE_NO_DIFF:
             if self.project.auto_archive_no_diff_builds:
                 self.archive()
-        else:
-            self.state = Build.STATE_PENDING_REVIEW
         self.date_finished = timezone.now()
         self.update_github_status()
 
@@ -170,6 +186,25 @@ class Build(models.Model):
             screenshot.archive()
             screenshot.save()
         self.archived = True
+
+    @cached_property
+    def screenshots_by_color(self):
+        screenshots = list(self.screenshots.all())
+        total_expected = len(screenshots)
+        if self.parent:
+            total_expected = max(total_expected, self.parent.screenshots.count())
+        return OrderedDict((
+            ('success',
+             len([s for s in screenshots if
+                  s.state == Screenshot.STATE_MATCHING]) / total_expected),
+            ('danger',
+             len([s for s in screenshots if s.state in [
+                 Screenshot.STATE_DELETED, Screenshot.STATE_DIFFERENT]]) / total_expected),
+            ('warning',
+             len([s for s in screenshots if s.state == Screenshot.STATE_PENDING]) / total_expected),
+            ('active',
+             len([s for s in screenshots if s.state == Screenshot.STATE_NEW]) / total_expected),
+        ))
 
     class Meta:
         ordering = ('-date_started',)

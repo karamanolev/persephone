@@ -1,0 +1,8 @@
+{% load builds_filters %}
+
+<div class="progress">
+    {% for item in build.screenshots_by_color.items %}
+        <div class="progress-bar progress-bar-{{ item.0 }}{% if build.state == build.STATE_RUNNING %} active{% endif %}"
+             style="width: {{ item.1|as_percentage }};"></div>
+    {% endfor %}
+</div>

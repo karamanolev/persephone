@@ -27,6 +27,26 @@
                         {{ form.github_api_key.label_tag }}
                         {% render_field form.github_api_key class+="form-control" %}
                     </div>
+                    <div class="form-group">
+                        <label>
+                            {% render_field form.auto_archive_no_diff_builds %}
+                            {{ form.auto_archive_no_diff_builds.label }}
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            {% render_field form.auto_approve_master_builds %}
+                            {{ form.auto_approve_master_builds.label }}
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        {{ form.max_master_builds_to_keep.label_tag }}
+                        {% render_field form.max_master_builds_to_keep class+="form-control" %}
+                    </div>
+                    <div class="form-group">
+                        {{ form.max_branch_builds_to_keep.label_tag }}
+                        {% render_field form.max_branch_builds_to_keep class+="form-control" %}
+                    </div>
                     <button type="submit" class="btn btn-primary">Save</button>
                 </div>
             </form>

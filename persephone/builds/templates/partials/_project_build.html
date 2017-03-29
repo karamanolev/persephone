@@ -5,13 +5,21 @@
             (originally #{{ build.original_build_number }})
         {% endif %}
     </td>
-    <td>{{ build.get_state_display }}</td>
+    <td>
+        {{ build.get_state_display }}
+        {% if build.reviewed_by %}
+            (by {{ build.reviewed_by }})
+        {% endif %}
+    </td>
     <td>{{ build.branch_name }}</td>
     <td>
         <a href="{% url 'builds:build' build.project_id build.id %}">
             {{ build.commit_hash }}
         </a>
         {% if build.archived %}(archived){% endif %}
+        {% if show_progress_bar %}
+            {% include 'partials/_build_progress_bar.html' %}
+        {% endif %}
     </td>
     <td>
         <form action="{% url 'builds:build_delete' build.project_id build.id %}"
