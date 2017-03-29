@@ -4,7 +4,8 @@
     {{ block.super }}
     <div class="well">
         <div class="pull-right">
-            <form action="{% url 'builds:project_delete' project.id %}" method="post" class="form-display-inline">
+            <form action="{% url 'builds:project_delete' project.id %}" method="post"
+                  class="form-display-inline">
                 {% csrf_token %}
                 <button type="button" class="btn btn-danger">Delete</button>
             </form>
@@ -16,7 +17,9 @@
         <a href="https://github.com/{{ project.name }}" target="_blank">
             <h4>
                 GitHub: {{ project.github_repo_name }}
-                <small><span class="glyphicon glyphicon-new-window" aria-hidden="true"></span></small>
+                <small>
+                    <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
+                </small>
             </h4>
         </a>
     </div>
@@ -24,30 +27,8 @@
     <div class="well">
         <h4><strong>Active</strong></h4>
         <table class="table table-bordered">
-            {% for build in project.builds.all %}
-                <tr>
-                    <td>
-                        {{ build.id }}
-                        {% if build.original_build_number %}
-                            (originally #{{ build.original_build_number }})
-                        {% endif %}
-                    </td>
-                    <td>{{ build.get_state_display }}</td>
-                    <td>{{ build.branch_name }}</td>
-                    <td>
-                        <a href="{% url 'builds:build' build.project_id build.id %}">
-                            {{ build.commit_hash }}
-                        </a>
-                        {% if build.archived %}(archived){% endif %}
-                    </td>
-                    <td>
-                        <form action="{% url 'builds:build_delete' build.project_id build.id %}"
-                              method="post">
-                            {% csrf_token %}
-                            <button class="btn btn-danger">Delete</button>
-                        </form>
-                    </td>
-                </tr>
+            {% for build in unarchived_builds %}
+                {% include 'partials/_project_build.html' %}
             {% endfor %}
         </table>
     </div>
@@ -55,30 +36,8 @@
     <div class="well">
         <h4><strong>History</strong></h4>
         <table class="table table-bordered">
-            {% for build in project.builds.all %}
-                <tr>
-                    <td>
-                        {{ build.id }}
-                        {% if build.original_build_number %}
-                            (originally #{{ build.original_build_number }})
-                        {% endif %}
-                    </td>
-                    <td>{{ build.get_state_display }}</td>
-                    <td>{{ build.branch_name }}</td>
-                    <td>
-                        <a href="{% url 'builds:build' build.project_id build.id %}">
-                            {{ build.commit_hash }}
-                        </a>
-                        {% if build.archived %}(archived){% endif %}
-                    </td>
-                    <td>
-                        <form action="{% url 'builds:build_delete' build.project_id build.id %}"
-                              method="post">
-                            {% csrf_token %}
-                            <button class="btn btn-danger">Delete</button>
-                        </form>
-                    </td>
-                </tr>
+            {% for build in archived_builds %}
+                {% include 'partials/_project_build.html' %}
             {% endfor %}
         </table>
     </div>

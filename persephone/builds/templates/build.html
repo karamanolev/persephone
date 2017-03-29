@@ -83,7 +83,7 @@
                     </div>
                     <div class="panel-body">
                         <div class="image image-parent">
-                            {% if screenshot.parent %}
+                            {% if screenshot.parent.image %}
                                 {% url 'builds:screenshot_image' build.parent.project_id build.parent.id screenshot.parent.name as image %}
                                 <img src="{{ image }}">
                             {% endif %}

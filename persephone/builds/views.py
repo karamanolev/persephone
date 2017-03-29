@@ -26,8 +26,11 @@ def index(request):
 
 @login_required
 def project(request, project_id):
+    project = Project.objects.get(id=project_id)
     data = {
-        'project': Project.objects.get(id=project_id),
+        'project': project,
+        'unarchived_builds': project.builds.filter(archived=False),
+        'archived_builds': project.builds.filter(archived=True),
     }
     return render(request, 'project.html', data)
 

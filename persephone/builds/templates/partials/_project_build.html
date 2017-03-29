@@ -1,0 +1,23 @@
+<tr>
+    <td>
+        {{ build.id }}
+        {% if build.original_build_number %}
+            (originally #{{ build.original_build_number }})
+        {% endif %}
+    </td>
+    <td>{{ build.get_state_display }}</td>
+    <td>{{ build.branch_name }}</td>
+    <td>
+        <a href="{% url 'builds:build' build.project_id build.id %}">
+            {{ build.commit_hash }}
+        </a>
+        {% if build.archived %}(archived){% endif %}
+    </td>
+    <td>
+        <form action="{% url 'builds:build_delete' build.project_id build.id %}"
+              method="post">
+            {% csrf_token %}
+            <button class="btn btn-danger">Delete</button>
+        </form>
+    </td>
+</tr>
