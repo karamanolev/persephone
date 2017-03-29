@@ -27,7 +27,9 @@
                 </div>
                 <br>
                 Project: {{ build.project.name }}<br>
-                Build ID: {{ build.id }}<br>
+                Build ID: {{ build.id }}
+                {% if build.archived %}(archived){% endif %}
+                <br>
                 State: {{ build.get_state_display }}<br>
                 Original Build:
                 {% with build.original_build_url as url %}

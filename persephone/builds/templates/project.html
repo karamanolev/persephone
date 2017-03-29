@@ -38,6 +38,7 @@
                         <a href="{% url 'builds:build' build.project_id build.id %}">
                             {{ build.commit_hash }}
                         </a>
+                        {% if build.archived %}(archived){% endif %}
                     </td>
                     <td>
                         <form action="{% url 'builds:build_delete' build.project_id build.id %}"
@@ -68,6 +69,7 @@
                         <a href="{% url 'builds:build' build.project_id build.id %}">
                             {{ build.commit_hash }}
                         </a>
+                        {% if build.archived %}(archived){% endif %}
                     </td>
                     <td>
                         <form action="{% url 'builds:build_delete' build.project_id build.id %}"
