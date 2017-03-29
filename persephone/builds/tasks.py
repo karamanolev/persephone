@@ -14,6 +14,7 @@ def process_build_created(build_id):
     build.state = Build.STATE_RUNNING
     build.update_github_status()
     build.save()
+    build.project.archive_old_builds()
 
 
 @app.task

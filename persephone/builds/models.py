@@ -4,6 +4,8 @@ import urllib.parse
 from django.core.files.base import ContentFile
 from django.db import models
 from django.db.models.query_utils import Q
+from django.db.models.signals import pre_delete
+from django.dispatch.dispatcher import receiver
 from django.urls.base import reverse
 from django.utils import timezone
 from django.utils.functional import cached_property
@@ -16,6 +18,9 @@ class Project(models.Model):
     public_endpoint = models.CharField(max_length=255)
     github_repo_name = models.CharField(max_length=128)
     github_api_key = models.CharField(max_length=128)
+    auto_archive_no_diff_builds = models.BooleanField(default=True)
+    max_master_builds_to_keep = models.IntegerField(default=8)
+    max_branch_builds_to_keep = models.IntegerField(default=8)
 
     @cached_property
     def github(self):
@@ -27,6 +32,25 @@ class Project(models.Model):
 
     def build_absolute_uri(self, uri):
         return urllib.parse.urljoin(self.public_endpoint, uri)
+
+    def archive_old_builds(self):
+        unarchived = self.builds.filter(archived=False).order_by('date_started')
+        while True:
+            master_builds = unarchived.filter(
+                Q(branch_name=None) | Q(branch_name__in=['', 'master', 'origin/master']))
+            if master_builds.count() <= self.max_master_builds_to_keep:
+                break
+            build = master_builds.first()
+            build.archive()
+            build.save()
+        while True:
+            branch_builds = unarchived.exclude(
+                Q(branch_name=None) | Q(branch_name__in=['', 'master', 'origin/master']))
+            if branch_builds.count() <= self.max_branch_builds_to_keep:
+                break
+            build = branch_builds.first()
+            build.archive()
+            build.save()
 
 
 class Build(models.Model):
@@ -50,7 +74,8 @@ class Build(models.Model):
     )
 
     project = models.ForeignKey(Project, related_name='builds')
-    parent = models.ForeignKey('self', null=True, related_name='children')
+    parent = models.ForeignKey('self', null=True, related_name='children',
+                               on_delete=models.SET_NULL)
     state = models.IntegerField(choices=STATE_CHOICES, default=STATE_INITIALIZING)
     original_build_number = models.CharField(max_length=64, blank=True, null=True)
     original_build_url = models.CharField(max_length=256, blank=True, null=True)
@@ -62,6 +87,7 @@ class Build(models.Model):
     branch_name = models.CharField(max_length=128, blank=True, null=True)
     pull_request_id = models.CharField(max_length=16, blank=True, null=True)
     commit_hash = models.CharField(max_length=64, db_index=True)
+    archived = models.BooleanField(default=False, db_index=True)
 
     @cached_property
     def github_commit(self):
@@ -132,10 +158,18 @@ class Build(models.Model):
                     )
         if all(s.state == Screenshot.STATE_MATCHING for s in self.screenshots.all()):
             self.state = Build.STATE_NO_DIFF
+            if self.project.auto_archive_no_diff_builds:
+                self.archive()
         else:
             self.state = Build.STATE_PENDING_REVIEW
         self.date_finished = timezone.now()
         self.update_github_status()
+
+    def archive(self):
+        for screenshot in self.screenshots.filter(archived=False):
+            screenshot.archive()
+            screenshot.save()
+        self.archived = True
 
     class Meta:
         ordering = ('-date_started',)
@@ -164,6 +198,7 @@ class Screenshot(models.Model):
     image = models.ImageField(upload_to='screenshots/')
     image_diff = models.ImageField(upload_to='screenshot_diffs/', null=True)
     image_diff_amount = models.FloatField(null=True)
+    archived = models.BooleanField(default=False, db_index=True)
 
     @cached_property
     def metadata(self):
@@ -203,7 +238,19 @@ class Screenshot(models.Model):
             else:
                 self.state = Screenshot.STATE_MATCHING
 
+    def archive(self):
+        if self.image:
+            self.image.delete(save=False)
+        if self.image_diff:
+            self.image_diff.delete(save=False)
+        self.archived = True
+
     class Meta:
         unique_together = (
             ('build', 'name'),
         )
+
+
+@receiver(pre_delete, sender=Screenshot)
+def screenshot_pre_delete(sender, instance, using, **kwargs):
+    instance.archive()
