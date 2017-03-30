@@ -151,16 +151,17 @@ class Build(models.Model):
         return self.get_master_baseline()
 
     def _finish_compute_state(self):
+        if all(s.state == Screenshot.STATE_MATCHING for s in self.screenshots.all()):
+            self.state = Build.STATE_NO_DIFF
+            return
+
         is_master = self.branch_name in Build.MASTER_BRANCH_NAMES
         if is_master and self.project.auto_approve_master_builds:
             self.state = Build.STATE_APPROVED
             self.reviewed_by = 'autoapprover'
             return
 
-        if all(s.state == Screenshot.STATE_MATCHING for s in self.screenshots.all()):
-            self.state = Build.STATE_NO_DIFF
-        else:
-            self.state = Build.STATE_PENDING_REVIEW
+        self.state = Build.STATE_PENDING_REVIEW
 
     def finish(self):
         screenshots = {s.name: s for s in self.screenshots.all()}
