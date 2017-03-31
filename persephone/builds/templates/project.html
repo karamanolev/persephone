@@ -3,48 +3,47 @@
 {% block container %}
     {{ block.super }}
     <div class="well">
-        <div class="pull-right">
-            <form action="{% url 'builds:project_delete' project.id %}" method="post"
-                  class="form-display-inline">
-                {% csrf_token %}
-                <button type="button" class="btn btn-danger">Delete</button>
-            </form>
-            <a class="btn btn-default"
-               href="{% url 'builds:project_update' project.id %}" role="button">Edit
-            </a>
-        </div>
-        <h3>Project {{ project.name }}</h3>
-        <a href="https://github.com/{{ project.name }}" target="_blank">
-            <h4>
-                GitHub: {{ project.github_repo_name }}
-                <small>
-                    <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
-                </small>
-            </h4>
-        </a>
-    </div>
+        <h3 class="align">
+            Project {{ project.name }}
 
-    <div class="well">
-        <h4><strong>Active</strong></h4>
+            (<a href="https://github.com/{{ project.github_repo_name }}"
+                target="_blank">{{ project.github_repo_name }}
+            <small><span
+                    class="glyphicon glyphicon-new-window" aria-hidden="true"></span></small>
+        </a>)
+
+            <div class="dropdown dropdown-inline">
+                <button type="button" class="btn btn-sm btn-default" data-toggle="dropdown">
+                    <span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li>
+                        <a href="{% url 'builds:project_update' project.id %}">
+                            Edit
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'builds:project_delete' project.id %}"
+                           data-action="confirm-post"
+                           data-csrf-token="{{ csrf_token }}">
+                            Delete
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </h3>
+
+        <hr>
+
+        <h4><strong>Builds</strong></h4>
         <table class="table table-bordered">
             {% for build in active_builds %}
                 {% with 1 as show_progress_bar %}
                     {% include 'partials/_project_build.html' %}
                 {% endwith %}
-            {% empty %}
-                <h4>
-                    <small>
-                        You have no currently active builds. When there are builds that are running
-                        or pending review, they will appear here.
-                    </small>
-                </h4>
             {% endfor %}
-        </table>
-    </div>
 
-    <div class="well">
-        <h4><strong>Past</strong></h4>
-        <table class="table table-bordered">
             {% for build in past_builds %}
                 {% include 'partials/_project_build.html' %}
             {% endfor %}

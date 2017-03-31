@@ -1,9 +1,13 @@
-<tr>
+<tr class="{% if build.state == build.STATE_RUNNING or build.state == build.STATE_PENDING_REVIEW %}active{% endif %}">
     <td>
-        {{ build.id }}
-        {% if build.original_build_number %}
-            (originally #{{ build.original_build_number }})
-        {% endif %}
+        <a href="{% url 'builds:build' build.project_id build.id %}">
+            {{ build.id }}
+            {% if build.original_build_number %}
+                (CI #{{ build.original_build_number }})
+            {% endif %}
+        </a>
+        <br>
+        {{ build.date_started }}
     </td>
     <td>
         {{ build.get_state_display }}
@@ -11,21 +15,33 @@
             (by {{ build.reviewed_by }})
         {% endif %}
     </td>
-    <td>{{ build.branch_name }}</td>
     <td>
+        {{ build.branch_name }}
+
         <a href="{% url 'builds:build' build.project_id build.id %}">
             {{ build.commit_hash }}
         </a>
         {% if build.archived %}(archived){% endif %}
+
         {% if show_progress_bar %}
             {% include 'partials/_build_progress_bar.html' %}
         {% endif %}
     </td>
     <td>
-        <form action="{% url 'builds:build_delete' build.project_id build.id %}"
-              method="post">
-            {% csrf_token %}
-            <button class="btn btn-danger">Delete</button>
-        </form>
+        <div class="dropdown dropdown-inline">
+            <button type="button" class="btn btn-sm btn-default" data-toggle="dropdown">
+                <span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+                <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu">
+                <li>
+                    <a href="{% url 'builds:build_delete' build.project_id build.id %}"
+                       data-action="confirm-post"
+                       data-csrf-token="{{ csrf_token }}">
+                        Delete
+                    </a>
+                </li>
+            </ul>
+        </div>
     </td>
 </tr>

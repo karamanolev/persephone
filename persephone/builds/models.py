@@ -54,6 +54,9 @@ class Project(models.Model):
             build.archive()
             build.save()
 
+    class Meta:
+        ordering = ('name',)
+
 
 class Build(models.Model):
     MASTER_BRANCH_NAMES = ['', 'master', 'origin/master']
@@ -191,7 +194,7 @@ class Build(models.Model):
     @cached_property
     def screenshots_by_color(self):
         screenshots = list(self.screenshots.all())
-        total_expected = len(screenshots)
+        total_expected = max(1, len(screenshots))
         if self.parent:
             total_expected = max(total_expected, self.parent.screenshots.count())
         return OrderedDict((

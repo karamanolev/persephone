@@ -1,19 +1,24 @@
 {% extends 'base.html' %}
+{% load builds_filters %}
 
 {% block container %}
     <nav class="navbar navbar-default">
         <div class="container-fluid">
             <ul class="nav navbar-nav">
-                <li class="active">
+                {% url 'builds:index' as url %}
+                <li class="{% if request.path == url %}active{% endif %}">
                     <a href="{% url 'builds:index' %}">
                         Dashboard
                     </a>
                 </li>
-                <li class="active">
-                    <a href="#">
-                        Help
-                    </a>
-                </li>
+                {% for project in projects %}
+                    {% url 'builds:project' project.id as url %}
+                    <li class="{% if request.path|startswith:url %}active{% endif %}">
+                        <a href="{% url 'builds:project' project.id %}">
+                            {{ project.name }}
+                        </a>
+                    </li>
+                {% endfor %}
             </ul>
         </div>
     </nav>

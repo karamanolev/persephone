@@ -1,5 +1,3 @@
-from collections import OrderedDict
-
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import transaction
@@ -21,7 +19,6 @@ from builds.utils import sort_screenshots_by_relevance
 @login_required
 def index(request):
     data = {
-        'projects': Project.objects.all(),
     }
     return render(request, 'index.html', data)
 

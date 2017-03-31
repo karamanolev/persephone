@@ -8,10 +8,27 @@
         <div class="col-md-12">
             <div class="well">
                 <div class="pull-right">
+                    <div class="dropdown dropdown-inline">
+                        <button type="button" class="btn btn-default" data-toggle="dropdown">
+                            <span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="{% url 'builds:build_delete' build.project_id build.id %}"
+                                   data-action="confirm-post"
+                                   data-csrf-token="{{ csrf_token }}">
+                                    Delete Build
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
                     <a href="{% url 'builds:project' build.project_id %}" class="btn btn-primary">
                         View Project
                     </a>
-                    {% if build.state == build.STATE_PENDING_REVIEW or build.state == build.STATE_REJECTED %}
+
+                    {% if build.state == build.STATE_PENDING_REVIEW %}
                         <form action="{% url 'builds:build_approve' build.project_id build.id %}"
                               method="post" class="form-display-inline">
                             {% csrf_token %}
@@ -25,39 +42,52 @@
                             <button class="btn btn-danger">Reject</button>
                         </form>
                     {% endif %}
-
-                    <form action="{% url 'builds:build_delete' build.project_id build.id %}"
-                          method="post" class="form-display-inline">
-                        {% csrf_token %}
-                        <button class="btn btn-danger">Delete</button>
-                    </form>
                 </div>
-                <br>
-                Project: {{ build.project.name }}<br>
-                Build ID: {{ build.id }}
-                {% if build.archived %}(archived){% endif %}
-                <br>
-                State: {{ build.get_state_display }}<br>
-                Original Build:
-                {% with build.original_build_url as url %}
-                    <a href="{% if url %}{{ url }}{% endif %}">
+
+                <h3>
+                    {{ build.id }}
+                    {% with build.original_build_url as url %}
+                        (<a href="{% if url %}{{ url }}{% endif %}">CI
                         #{{ build.original_build_number }}
+                        <small><span
+                                class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
+                        </small>
+                    </a>)
+                    {% endwith %}
+                    {% if build.archived %}
+                        <span class="glyphicon glyphicon-compressed" aria-hidden="true"></span>
+                    {% endif %}
+                </h3>
+                <h4>
+                    {{ build.branch_name }}
+                    <a href="https://github.com/{{ build.project.github_repo_name }}/commit/{{ build.commit_hash }}">
+                        {{ build.commit_hash }}
+                        <small><span
+                                class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
+                        </small>
                     </a>
-                {% endwith %}
-                <br>
+                </h4>
+                <h4>
+                    {% if build.pull_request_id %}
+                        Pull Request:
+                        <a href="https://github.com/{{ build.project.github_repo_name }}/pull/{{ build.pull_request_id }}">
+                            #{{ build.pull_request_id }}</a>
+                        <br>
+                    {% endif %}
+                </h4>
+                <h4>State: {{ build.get_state_display }}</h4>
                 Started: {{ build.date_started }}<br>
-                Finished: {{ build.date_finished }}<br>
-                Approved: {{ build.date_approved }}<br>
-                Rejected: {{ build.date_rejected }}<br>
-                Reviewed by: {{ build.reviewed_by }}<br>
-                Branch: {{ build.branch_name }}<br>
-                Commit: {{ build.commit_hash }}<br>
-                {% if build.pull_request_id %}
-                    Pull Request:
-                    <a href="https://github.com/{{ build.project.github_repo_name }}/pull/{{ build.pull_request_id }}">
-                        #{{ build.pull_request_id }}
-                    </a>
-                    <br>
+                {% if build.date_finished %}
+                    Finished: {{ build.date_finished }}<br>
+                {% endif %}
+                {% if build.date_approved %}
+                    Approved: {{ build.date_approved }}<br>
+                {% endif %}
+                {% if build.date_rejected %}
+                    Rejected: {{ build.date_rejected }}<br>
+                {% endif %}
+                {% if build.reviewed_by %}
+                    Reviewed by: {{ build.reviewed_by }}<br>
                 {% endif %}
                 Baseline:
                 {% if build.parent %}
@@ -68,7 +98,6 @@
                 {% else %}
                     no baseline
                 {% endif %}
-                <br>
 
                 {% if build.screenshots_by_color %}
                     {% include 'partials/_build_progress_bar.html' %}
