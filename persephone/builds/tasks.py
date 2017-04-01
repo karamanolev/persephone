@@ -15,6 +15,14 @@ def process_build_created(build_id):
     build.update_github_status()
     build.save()
     build.project.archive_old_builds()
+    if build.project.supersede_same_branch_builds:
+        previous_builds = Build.objects.filter(
+            state=Build.STATE_PENDING_REVIEW,
+            branch_name=build.branch_name,
+        )
+        for previous_build in previous_builds:
+            previous_build.supersede()
+            previous_build.save()
 
 
 @app.task

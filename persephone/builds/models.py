@@ -23,6 +23,7 @@ class Project(models.Model):
     auto_approve_master_builds = models.BooleanField(default=True)
     max_master_builds_to_keep = models.IntegerField(default=20)
     max_branch_builds_to_keep = models.IntegerField(default=20)
+    supersede_same_branch_builds = models.BooleanField(default=True)
 
     @cached_property
     def github(self):
@@ -69,6 +70,7 @@ class Build(models.Model):
     STATE_APPROVED = 5
     STATE_REJECTED = 6
     STATE_FAILED = 7
+    STATE_SUPERSEDED = 8
     STATE_CHOICES = (
         (STATE_INITIALIZING, 'Initializing'),
         (STATE_RUNNING, 'Running'),
@@ -78,6 +80,7 @@ class Build(models.Model):
         (STATE_APPROVED, 'Approved'),
         (STATE_REJECTED, 'Rejected'),
         (STATE_FAILED, 'Failed'),
+        (STATE_SUPERSEDED, 'Superseeded'),
     )
 
     project = models.ForeignKey(Project, related_name='builds')
@@ -91,7 +94,7 @@ class Build(models.Model):
     date_approved = models.DateTimeField(null=True)
     date_rejected = models.DateTimeField(null=True)
     reviewed_by = models.CharField(max_length=128, blank=True, null=True)
-    branch_name = models.CharField(max_length=128, blank=True, null=True)
+    branch_name = models.CharField(max_length=128, blank=True, null=True, db_index=True)
     pull_request_id = models.CharField(max_length=16, blank=True, null=True)
     commit_hash = models.CharField(max_length=64, blank=True, null=True, db_index=True)
     archived = models.BooleanField(default=False, db_index=True)
@@ -211,6 +214,9 @@ class Build(models.Model):
             ('active',
              len([s for s in screenshots if s.state == Screenshot.STATE_NEW]) / total_expected),
         ))
+
+    def supersede(self):
+        self.state = Build.STATE_SUPERSEDED
 
     class Meta:
         ordering = ('-date_started',)

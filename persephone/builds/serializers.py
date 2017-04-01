@@ -43,6 +43,7 @@ class BuildSerializer(serializers.ModelSerializer):
         (Build.STATE_APPROVED, 'approved'),
         (Build.STATE_REJECTED, 'rejected'),
         (Build.STATE_FAILED, 'failed'),
+        (Build.STATE_SUPERSEDED, 'superseded'),
     )
 
     project = serializers.PrimaryKeyRelatedField(read_only=True)

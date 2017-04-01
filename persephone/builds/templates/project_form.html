@@ -29,6 +29,12 @@
                     </div>
                     <div class="form-group">
                         <label>
+                            {% render_field form.supersede_same_branch_builds %}
+                            {{ form.supersede_same_branch_builds.label }}
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label>
                             {% render_field form.auto_archive_no_diff_builds %}
                             {{ form.auto_archive_no_diff_builds.label }}
                         </label>
