@@ -26,7 +26,7 @@ body {
 }
 
 .project-list .thumbnail {
-    height: 200px;
+    height: 220px;
     text-decoration: none;
 }
 
@@ -36,4 +36,8 @@ body {
 
 .dropdown-inline {
     display: inline-block;
+}
+
+.subtle-underline {
+    border-bottom: 1px dashed #999999;
 }

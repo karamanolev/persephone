@@ -93,7 +93,7 @@ class Build(models.Model):
     reviewed_by = models.CharField(max_length=128, blank=True, null=True)
     branch_name = models.CharField(max_length=128, blank=True, null=True)
     pull_request_id = models.CharField(max_length=16, blank=True, null=True)
-    commit_hash = models.CharField(max_length=64, db_index=True)
+    commit_hash = models.CharField(max_length=64, blank=True, null=True, db_index=True)
     archived = models.BooleanField(default=False, db_index=True)
 
     @cached_property
@@ -105,6 +105,8 @@ class Build(models.Model):
         return self.project.github_repo.get_pull(int(self.pull_request_id))
 
     def update_github_status(self):
+        if not self.commit_hash:
+            return
         kwargs = {
             'state': {
                 Build.STATE_INITIALIZING: 'pending',

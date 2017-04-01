@@ -1,5 +1,5 @@
 {% extends 'page.html' %}
-{% load builds_filters %}
+{% load builds_filters humanize %}
 
 {% block container %}
     {{ block.super }}
@@ -21,6 +21,21 @@
                                     Delete Build
                                 </a>
                             </li>
+                            {% if build.state == build.STATE_REJECTED %}
+                                <li>
+                                    <a href="{% url 'builds:build_approve' build.project_id build.id %}"
+                                       data-action="post" data-csrf-token="{{ csrf_token }}">
+                                        Approve
+                                    </a>
+                                </li>
+                            {% elif build.state == build.STATE_APPROVED %}
+                                <li>
+                                    <a href="{% url 'builds:build_reject' build.project_id build.id %}"
+                                       data-action="post" data-csrf-token="{{ csrf_token }}">
+                                        Reject
+                                    </a>
+                                </li>
+                            {% endif %}
                         </ul>
                     </div>
 
@@ -29,18 +44,16 @@
                     </a>
 
                     {% if build.state == build.STATE_PENDING_REVIEW %}
-                        <form action="{% url 'builds:build_approve' build.project_id build.id %}"
-                              method="post" class="form-display-inline">
-                            {% csrf_token %}
-                            <button class="btn btn-success">Approve</button>
-                        </form>
-                    {% endif %}
-                    {% if build.state == build.STATE_PENDING_REVIEW or build.state == build.STATE_APPROVED %}
-                        <form action="{% url 'builds:build_reject' build.project_id build.id %}"
-                              method="post" class="form-display-inline">
-                            {% csrf_token %}
-                            <button class="btn btn-danger">Reject</button>
-                        </form>
+                        <a href="{% url 'builds:build_approve' build.project_id build.id %}"
+                           data-action="post" data-csrf-token="{{ csrf_token }}"
+                           class="btn btn-success">
+                            Approve
+                        </a>
+                        <a href="{% url 'builds:build_reject' build.project_id build.id %}"
+                           data-action="post" data-csrf-token="{{ csrf_token }}"
+                           class="btn btn-danger">
+                            Reject
+                        </a>
                     {% endif %}
                 </div>
 
@@ -76,15 +89,39 @@
                     {% endif %}
                 </h4>
                 <h4>State: {{ build.get_state_display }}</h4>
-                Started: {{ build.date_started }}<br>
+                Started:
+                <span class="subtle-underline"
+                      data-toggle="tooltip"
+                      title="{{ build.date_started }}">
+                    {{ build.date_started|naturaltime }}
+                </span>
+                <br>
                 {% if build.date_finished %}
-                    Finished: {{ build.date_finished }}<br>
+                    Finished:
+                    <span class="subtle-underline"
+                          data-toggle="tooltip"
+                          title="{{ build.date_finished }}">
+                        {{ build.date_finished|naturaltime }}
+                    </span>
+                    <br>
                 {% endif %}
                 {% if build.date_approved %}
-                    Approved: {{ build.date_approved }}<br>
+                    Approved:
+                    <span class="subtle-underline"
+                          data-toggle="tooltip"
+                          title="{{ build.date_approved }}">
+                        {{ build.date_approved|naturaltime }}
+                    </span>
+                    <br>
                 {% endif %}
                 {% if build.date_rejected %}
-                    Rejected: {{ build.date_rejected }}<br>
+                    Rejected:
+                    <span class="subtle-underline"
+                          data-toggle="tooltip"
+                          title="{{ build.date_rejected }}">
+                        {{ build.date_rejected|naturaltime }}
+                    </span>
+                    <br>
                 {% endif %}
                 {% if build.reviewed_by %}
                     Reviewed by: {{ build.reviewed_by }}<br>

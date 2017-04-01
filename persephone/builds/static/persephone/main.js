@@ -18,11 +18,13 @@ $(function() {
 
     $('*[data-action="confirm-post"]').click(function(e) {
         e.preventDefault();
-        aPost.apply(this, true);
+        aPost.apply(this, [true]);
     });
 
     $('*[data-action="post"]').click(function(e) {
         e.preventDefault();
-        aPost.apply(this, false);
-    })
+        aPost.apply(this, [false]);
+    });
+
+    $('*[data-toggle="tooltip"]').tooltip();
 });
