@@ -34,6 +34,7 @@ class BuildFactory(factory.DjangoModelFactory):
     original_build_number = '150'
     original_build_url = 'http://jenkins.example.com/builds/150'
     date_approved = datetime(2017, 3, 1, 9, 0, 0, tzinfo=UTC)
+    date_finished = datetime(2017, 2, 28, 9, 0, 0, tzinfo=UTC)
     reviewed_by = 'test_user'
     branch_name = 'origin/master'
     pull_request_id = '123'
