@@ -4,4 +4,5 @@ python:
   - "3.5"
 install:
   - pip install -r requirements.txt
+before_script: cd persephone/
 script: ./manage.py test
