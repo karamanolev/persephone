@@ -6,3 +6,4 @@ PyGithub==1.33
 celery==4.0.2
 Pillow==4.0.0
 requests==2.13.0
+factory-boy==2.8.1
