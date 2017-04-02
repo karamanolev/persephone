@@ -55,6 +55,14 @@ class Project(models.Model):
             build.archive()
             build.save()
 
+    def get_master_baseline(self):
+        builds = self.builds.filter(
+            Q(state=Build.STATE_APPROVED, archived=False)
+            &
+            (Q(branch_name=None) | Q(branch_name__in=Build.MASTER_BRANCH_NAMES))
+        )
+        return builds.filter(date_finished__isnull=False).order_by('-date_started').first()
+
     class Meta:
         ordering = ('name',)
 
@@ -89,7 +97,7 @@ class Build(models.Model):
     state = models.IntegerField(choices=STATE_CHOICES, default=STATE_INITIALIZING)
     original_build_number = models.CharField(max_length=64, blank=True, null=True)
     original_build_url = models.CharField(max_length=256, blank=True, null=True)
-    date_started = models.DateTimeField(auto_now_add=True)
+    date_started = models.DateTimeField(default=timezone.now())
     date_finished = models.DateTimeField(null=True)
     date_approved = models.DateTimeField(null=True)
     date_rejected = models.DateTimeField(null=True)
@@ -139,14 +147,6 @@ class Build(models.Model):
             kwargs['target_url'] = url
         self.github_commit.create_status(**kwargs)
 
-    def get_master_baseline(self):
-        builds = self.project.builds.filter(
-            Q(state=self.STATE_APPROVED, archived=False)
-            &
-            (Q(branch_name=None) | Q(branch_name__in=Build.MASTER_BRANCH_NAMES))
-        )
-        return builds.filter(date_finished__isnull=False).order_by('-date_started').first()
-
     def find_parent(self):
         if self.pull_request_id:
             pr_build = Build.objects.filter(
@@ -156,7 +156,7 @@ class Build(models.Model):
             ).order_by('-date_started').first()
             if pr_build is not None:
                 return pr_build
-        return self.get_master_baseline()
+        return self.project.get_master_baseline()
 
     def _finish_compute_state(self):
         if all(s.state == Screenshot.STATE_MATCHING for s in self.screenshots.all()):
