@@ -4,6 +4,9 @@ persephone
 Web application making visual regression testing simple
 -------------------------------------------------------
 
+.. image:: https://travis-ci.org/karamanolev/persephone.svg?branch=master
+    :target: https://travis-ci.org/karamanolev/persephone
+
 If you:
 
 * Host your code on GitHub (public or private).
