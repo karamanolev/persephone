@@ -97,7 +97,7 @@ class Build(models.Model):
     state = models.IntegerField(choices=STATE_CHOICES, default=STATE_INITIALIZING)
     original_build_number = models.CharField(max_length=64, blank=True, null=True)
     original_build_url = models.CharField(max_length=256, blank=True, null=True)
-    date_started = models.DateTimeField(default=timezone.now())
+    date_started = models.DateTimeField(default=timezone.now)
     date_finished = models.DateTimeField(null=True)
     date_approved = models.DateTimeField(null=True)
     date_rejected = models.DateTimeField(null=True)
