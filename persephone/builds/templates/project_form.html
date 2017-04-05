@@ -10,7 +10,6 @@
                 {% csrf_token %}
                 {{ form.errors }}
                 <div class="well">
-                    {% csrf_token %}
                     <div class="form-group">
                         {{ form.name.label_tag }}
                         {% render_field form.name class+="form-control" %}

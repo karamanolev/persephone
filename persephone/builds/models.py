@@ -14,6 +14,18 @@ from github.MainClass import Github
 from wand.image import Image
 
 
+class GlobalSettings(models.Model):
+    google_login_enabled = models.BooleanField(default=False)
+    google_whitelist = models.TextField(null=True, blank=True)
+
+    @classmethod
+    def get(cls):
+        try:
+            return cls.objects.get()
+        except GlobalSettings.DoesNotExist:
+            return cls.objects.create()
+
+
 class Project(models.Model):
     name = models.CharField(max_length=128)
     public_endpoint = models.CharField(max_length=255)

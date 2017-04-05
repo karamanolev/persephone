@@ -36,9 +36,14 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
+    'django.contrib.sites',
     'widget_tweaks',
     'rest_framework',
     'builds',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
 ]
 
 MIDDLEWARE = [
@@ -117,6 +122,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 CELERY_TASK_DEFAULT_QUEUE = 'persephone'
 
@@ -124,3 +130,11 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
 LOGIN_REDIRECT_URL = '/'
+
+SITE_ID = 1
+
+ACCOUNT_ADAPTER = 'builds.allauth_adapters.BuildsAccountAdapter'
+SOCIALACCOUNT_ADAPTER = 'builds.allauth_adapters.BuildsSocialAccountAdapter'
+SOCIALACCOUNT_EMAIL_VERIFICATION = 'none'
+SOCIALACCOUNT_EMAIL_REQUIRED = True
+SOCIALACCOUNT_QUERY_EMAIL = True

@@ -7,18 +7,38 @@
             <ul class="nav navbar-nav">
                 {% url 'builds:index' as url %}
                 <li class="{% if request.path == url %}active{% endif %}">
-                    <a href="{% url 'builds:index' %}">
+                    <a href="{{ url }}">
                         Dashboard
                     </a>
                 </li>
+
                 {% for project in projects %}
                     {% url 'builds:project' project.id as url %}
                     <li class="{% if request.path|startswith:url %}active{% endif %}">
-                        <a href="{% url 'builds:project' project.id %}">
+                        <a href="{{ url }}">
                             {{ project.name }}
                         </a>
                     </li>
                 {% endfor %}
+
+                {% url 'builds:global_settings' as url %}
+                <li class="{% if request.path == url %}active{% endif %}">
+                    <a href="{{ url }}">
+                        Settings
+                    </a>
+                </li>
+
+                {% url 'admin:index' as url %}
+                <li class="{% if request.path == url %}active{% endif %}">
+                    <a href="{{ url }}">
+                        Admin
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{% url 'account_logout' %}" data-action="post"
+                       data-csrf-token="{{ csrf_token }}">Logout</a>
+                </li>
             </ul>
         </div>
     </nav>

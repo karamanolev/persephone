@@ -1,7 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import transaction
-from django.http.response import HttpResponseForbidden, HttpResponse
+from django.http.response import HttpResponseForbidden, HttpResponse, HttpResponseNotAllowed
 from django.shortcuts import render, redirect
 from django.urls.base import reverse_lazy
 from django.utils import timezone
@@ -11,6 +11,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from builds import tasks
+from builds.forms import GlobalSettingsForm
 from builds.models import Build, Project, Screenshot
 from builds.serializers import BuildSerializer, ProjectSerializer, ScreenshotSerializer
 from builds.utils import sort_screenshots_by_relevance
@@ -21,6 +22,26 @@ def index(request):
     data = {
     }
     return render(request, 'index.html', data)
+
+
+def domain_not_allowed(request):
+    return render(request, 'domain_not_allowed.html')
+
+
+def global_settings(request):
+    if request.method == 'GET':
+        form = GlobalSettingsForm(request=request)
+    elif request.method == 'POST':
+        form = GlobalSettingsForm(request=request, data=request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('builds:global_settings')
+    else:
+        return HttpResponseNotAllowed(['GET', 'POST'])
+    data = {
+        'form': form,
+    }
+    return render(request, 'global_settings.html', data)
 
 
 @login_required

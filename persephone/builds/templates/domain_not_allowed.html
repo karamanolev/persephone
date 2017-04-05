@@ -1,0 +1,17 @@
+{% include 'base.html' %}
+
+{% block container %}
+    <div class="row">
+        <div class="col-md-4 col-md-offset-4">
+            <div class="well">
+                <p>
+                    Your email is not allowed to access this application.<br>
+                    You can try logging in using another one.
+                </p>
+                <p>
+                    <a href="{% url 'account_login' %}" class="btn btn-primary">Try again</a>
+                </p>
+            </div>
+        </div>
+    </div>
+{% endblock %}

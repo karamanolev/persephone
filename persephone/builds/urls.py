@@ -4,6 +4,8 @@ from builds import views
 
 urlpatterns = [
     url('^$', views.index, name='index'),
+    url('^global-settings$', views.global_settings, name='global_settings'),
+    url('^domain-not-allowed$', views.domain_not_allowed, name='domain_not_allowed'),
     url('^projects/create$', views.ProjectCreate.as_view(), name='project_create'),
     url('^projects/(\d+)/$', views.project, name='project'),
     url('^projects/(?P<pk>\d+)/delete$', views.ProjectDelete.as_view(), name='project_delete'),
