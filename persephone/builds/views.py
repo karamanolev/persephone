@@ -118,7 +118,7 @@ def build_action(action):
             build.date_rejected = timezone.now()
         else:
             raise Exception('Unknown action {}'.format(action))
-        build.reviewed_by = request.user.username
+        build.reviewed_by = request.user.email or request.user.username
         build.save()
         build.update_github_status()
         return redirect('builds:build', project_id, build_id)
