@@ -100,7 +100,7 @@ class Build(models.Model):
         (STATE_APPROVED, 'Approved'),
         (STATE_REJECTED, 'Rejected'),
         (STATE_FAILED, 'Failed'),
-        (STATE_SUPERSEDED, 'Superseeded'),
+        (STATE_SUPERSEDED, 'Superseded'),
     )
 
     project = models.ForeignKey(Project, related_name='builds')
