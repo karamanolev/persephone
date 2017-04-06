@@ -34,6 +34,20 @@
                         Admin
                     </a>
                 </li>
+            </ul>
+
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <p class="navbar-text">
+                        {% if request.user.first_name or request.user.last_name %}
+                            {{ request.user.first_name }} {{ request.user.last_name }}
+                        {% elif request.user.email %}
+                            {{ request.user.email }}
+                        {% else %}
+                            {{ request.user.username }}
+                        {% endif %}
+                    </p>
+                </li>
 
                 <li>
                     <a href="{% url 'account_logout' %}" data-action="post"
