@@ -2,6 +2,34 @@ body {
     padding-top: 20px;
 }
 
+/* Login Page */
+
+.socialaccount_providers {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.socialaccount_provider.google {
+    display: inline-block;
+    text-indent: -9999px;
+    width: 191px;
+    height: 46px;
+    background-image: url('img/btn_google_signin.png');
+    background-size: 191px 46px;
+}
+
+.login-separator {
+    margin: 10px 0 10px 0;
+    border-top: 1px solid #cccccc;
+}
+
+.btn-login {
+    width: 191px;
+}
+
+/* Common Code */
+
 .form-display-inline {
     display: inline;
 }
@@ -40,19 +68,4 @@ body {
 
 .subtle-underline {
     border-bottom: 1px dashed #999999;
-}
-
-.socialaccount_providers {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-}
-
-.socialaccount_provider.google {
-    display: inline-block;
-    text-indent: -9999px;
-    width: 191px;
-    height: 46px;
-    background-image: url('img/btn_google_signin.png');
-    background-size: 191px 46px;
 }
