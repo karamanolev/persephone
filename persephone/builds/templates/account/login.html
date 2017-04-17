@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load widget_tweaks i18n account socialaccount %}
+{% load staticfiles widget_tweaks i18n account socialaccount %}
 
 {% block container %}
     {% get_providers as socialaccount_providers %}
@@ -7,7 +7,10 @@
     <div class="row">
         <div class="col-md-offset-4 col-md-4">
             <div class="well">
-                <h2>Persephone Login</h2>
+                <h2 class="login-title">
+                    <img alt="P" src="{% static 'persephone/img/logo.svg' %}">ersephone
+                    Login
+                </h2>
                 <form class="login" method="POST" action="{% url 'account_login' %}">
                     {% csrf_token %}
                     <input type="hidden"
