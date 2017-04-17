@@ -8,9 +8,8 @@
                 {% url 'builds:index' as url %}
 
                 <a class="navbar-brand" href="{{ url }}">
-                    <img alt="Brand" src="{% static 'persephone/img/logo.svg' %}">
+                    <img alt="Logo" src="{% static 'persephone/img/logo.svg' %}">
                 </a>
-{#                <img src="{% static 'persephone/img/logo.svg' %}">#}
 
                 <li class="{% if request.path == url %}active{% endif %}">
                     <a href="{{ url }}">
