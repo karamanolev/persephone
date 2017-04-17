@@ -1,11 +1,17 @@
 {% extends 'base.html' %}
-{% load builds_filters %}
+{% load staticfiles builds_filters %}
 
 {% block container %}
     <nav class="navbar navbar-default">
         <div class="container-fluid">
             <ul class="nav navbar-nav">
                 {% url 'builds:index' as url %}
+
+                <a class="navbar-brand" href="{{ url }}">
+                    <img alt="Brand" src="{% static 'persephone/img/logo.svg' %}">
+                </a>
+{#                <img src="{% static 'persephone/img/logo.svg' %}">#}
+
                 <li class="{% if request.path == url %}active{% endif %}">
                     <a href="{{ url }}">
                         Dashboard

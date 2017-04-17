@@ -25,7 +25,16 @@ body {
 }
 
 .btn-login {
-    width: 191px;
+    width: 100%;
+}
+
+.login-title {
+    text-align: center;
+}
+
+.login-title > img {
+    vertical-align: baseline;
+    margin-right: -7px;
 }
 
 /* Common Code */
@@ -68,4 +77,8 @@ body {
 
 .subtle-underline {
     border-bottom: 1px dashed #999999;
+}
+
+.navbar-brand {
+    padding: 8px 5px 8px 15px;
 }
