@@ -40,6 +40,19 @@ def process_build_finished(build_id, retries_remaining=12):
 
 @app.task
 @transaction.atomic
+def process_build_failed(build_id, retries_remaining=12):
+    build = Build.objects.select_for_update().get(id=build_id)
+    if any(s.state == Screenshot.STATE_PENDING for s in build.screenshots.all()):
+        if retries_remaining == 0:
+            raise Exception('Screenshot processing did not finish on time')
+        process_build_failed.apply_async(args=(build_id, retries_remaining - 1), countdown=5)
+        return
+    build.fail()
+    build.save()
+
+
+@app.task
+@transaction.atomic
 def process_screenshot(screenshot_id, retries_remaing=3):
     screenshot = Screenshot.objects.select_for_update().get(id=screenshot_id)
     if screenshot.build.state == Build.STATE_INITIALIZING:

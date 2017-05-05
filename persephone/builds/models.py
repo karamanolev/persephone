@@ -91,6 +91,7 @@ class Build(models.Model):
     STATE_REJECTED = 6
     STATE_FAILED = 7
     STATE_SUPERSEDED = 8
+    STATE_FAILING = 9
     STATE_CHOICES = (
         (STATE_INITIALIZING, 'Initializing'),
         (STATE_RUNNING, 'Running'),
@@ -101,6 +102,7 @@ class Build(models.Model):
         (STATE_REJECTED, 'Rejected'),
         (STATE_FAILED, 'Failed'),
         (STATE_SUPERSEDED, 'Superseded'),
+        (STATE_FAILING, 'Failing'),
     )
 
     project = models.ForeignKey(Project, related_name='builds')
@@ -139,6 +141,7 @@ class Build(models.Model):
                 Build.STATE_NO_DIFF: 'success',
                 Build.STATE_APPROVED: 'success',
                 Build.STATE_REJECTED: 'failure',
+                Build.STATE_FAILING: 'error',
                 Build.STATE_FAILED: 'error',
             }[self.state],
             'description': {
@@ -149,6 +152,7 @@ class Build(models.Model):
                 Build.STATE_NO_DIFF: 'There are no visual differences detected.',
                 Build.STATE_APPROVED: 'Visual diff is approved.',
                 Build.STATE_REJECTED: 'Visual diff is rejected.',
+                Build.STATE_FAILING: 'Build is failing.',
                 Build.STATE_FAILED: 'Build failed.',
             }[self.state],
             'context': 'persephone',
@@ -186,7 +190,10 @@ class Build(models.Model):
     def finish(self):
         screenshots = {s.name: s for s in self.screenshots.all()}
         if self.parent:
-            parent_screenshots = {s.name: s for s in self.parent.screenshots.all()}
+            parent_screenshots = {
+                s.name: s for s in
+                self.parent.screenshots.exclude(state=Screenshot.STATE_DELETED)
+            }
             for parent_name, parent_screenshot in parent_screenshots.items():
                 if parent_name not in screenshots:
                     Screenshot.objects.create(
@@ -200,6 +207,10 @@ class Build(models.Model):
             if self.project.auto_archive_no_diff_builds:
                 self.archive()
         self.date_finished = timezone.now()
+        self.update_github_status()
+
+    def fail(self):
+        self.state = Build.STATE_FAILED
         self.update_github_status()
 
     def archive(self):

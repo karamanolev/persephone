@@ -197,8 +197,9 @@ class APIBuildFail(APIView):
         build = Build.objects.get(project_id=project_id, id=build_id)
         if build.state != Build.STATE_RUNNING:
             return HttpResponseForbidden()
-        build.state = Build.STATE_FAILED
+        build.state = Build.STATE_FAILING
         build.save()
+        transaction.on_commit(lambda: tasks.process_build_failed(build.id))
         return Response(BuildSerializer(build).data)
 
 
