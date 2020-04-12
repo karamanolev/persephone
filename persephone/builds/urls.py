@@ -2,6 +2,8 @@ from django.conf.urls import url
 
 from builds import views
 
+app_name = 'builds'
+
 urlpatterns = [
     url('^$', views.index, name='index'),
     url('^global-settings$', views.global_settings, name='global_settings'),

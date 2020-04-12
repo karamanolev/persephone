@@ -13,18 +13,22 @@
                     <div class="form-group">
                         {{ form.name.label_tag }}
                         {% render_field form.name class+="form-control" %}
+                        <div class="form-help-text">{{ form.name.help_text }}</div>
                     </div>
                     <div class="form-group">
                         {{ form.public_endpoint.label_tag }}
                         {% render_field form.public_endpoint class+="form-control" %}
+                        <div class="form-help-text">{{ form.public_endpoint.help_text }}</div>
                     </div>
                     <div class="form-group">
                         {{ form.github_repo_name.label_tag }}
                         {% render_field form.github_repo_name class+="form-control" %}
+                        <div class="form-help-text">{{ form.github_repo_name.help_text }}</div>
                     </div>
                     <div class="form-group">
                         {{ form.github_api_key.label_tag }}
                         {% render_field form.github_api_key class+="form-control" %}
+                        <div class="form-help-text">{{ form.github_api_key.help_text }}</div>
                     </div>
                     <div class="form-group">
                         <label>

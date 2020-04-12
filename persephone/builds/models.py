@@ -27,10 +27,19 @@ class GlobalSettings(models.Model):
 
 
 class Project(models.Model):
-    name = models.CharField(max_length=128)
-    public_endpoint = models.CharField(max_length=255)
-    github_repo_name = models.CharField(max_length=128)
-    github_api_key = models.CharField(max_length=128)
+    name = models.CharField(
+        max_length=128,
+        help_text='Name for your project - used for display purposes.',
+    )
+    public_endpoint = models.CharField(
+        max_length=255,
+        help_text='An absolute URL to this website - used for constructing URLs to builds.',
+    )
+    github_repo_name = models.CharField(
+        max_length=128,
+        help_text='owner/repo of the GitHub project.',
+    )
+    github_api_key = models.CharField(max_length=128, help_text='A GitHub access token.')
     auto_archive_no_diff_builds = models.BooleanField(default=True)
     auto_approve_master_builds = models.BooleanField(default=True)
     max_master_builds_to_keep = models.IntegerField(default=20)
@@ -105,9 +114,8 @@ class Build(models.Model):
         (STATE_FAILING, 'Failing'),
     )
 
-    project = models.ForeignKey(Project, related_name='builds')
-    parent = models.ForeignKey('self', null=True, related_name='children',
-                               on_delete=models.SET_NULL)
+    project = models.ForeignKey(Project, models.CASCADE, related_name='builds')
+    parent = models.ForeignKey('self', models.SET_NULL, null=True, related_name='children')
     state = models.IntegerField(choices=STATE_CHOICES, default=STATE_INITIALIZING)
     original_build_number = models.CharField(max_length=64, blank=True, null=True)
     original_build_url = models.CharField(max_length=256, blank=True, null=True)
@@ -246,6 +254,8 @@ class Build(models.Model):
 
 
 class Screenshot(models.Model):
+    DIFF_EPSILON = 1e-4
+
     STATE_PENDING = 0
     STATE_MATCHING = 1
     STATE_DIFFERENT = 2
@@ -259,9 +269,9 @@ class Screenshot(models.Model):
         (STATE_DELETED, 'Deleted'),
     )
 
-    build = models.ForeignKey(Build, related_name='screenshots')
+    build = models.ForeignKey(Build, models.CASCADE, related_name='screenshots')
     state = models.IntegerField(choices=STATE_CHOICES, default=STATE_PENDING)
-    parent = models.ForeignKey('self', null=True, related_name='children')
+    parent = models.ForeignKey('self', models.SET_NULL, null=True, related_name='children')
     date_created = models.DateTimeField(auto_now_add=True)
     name = models.CharField(max_length=255)
     metadata_json = models.TextField(blank=True, null=True)
@@ -299,7 +309,7 @@ class Screenshot(models.Model):
             wand_diff, difference = wand_current.compare(wand_parent, metric='root_mean_square')
 
             self.image_diff_amount = difference
-            if difference > 0:
+            if difference > self.DIFF_EPSILON:
                 self.image_diff = ContentFile(
                     wand_diff.make_blob('png'),
                     name='{}_{}_diff.png'.format(self.parent.id, self.id),

@@ -43,6 +43,11 @@ body {
     display: inline;
 }
 
+.form-help-text {
+    color: #666;
+    padding-top: 4px;
+}
+
 .collapsed-screenshot {
     display: none;
 }
