@@ -166,8 +166,8 @@ class Build(models.Model):
             'context': 'persephone',
         }
         if self.project.public_endpoint:
-            url = self.project.build_absolute_uri(reverse(
-                'builds:build', args=(self.project_id, self.id)))
+            url = self.project.build_absolute_uri('/projects/{}/builds/{}'.format(
+                self.project_id, self.id))
             kwargs['target_url'] = url
         self.github_commit.create_status(**kwargs)
 

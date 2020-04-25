@@ -1,5 +1,6 @@
 body {
-    padding-top: 20px;
+    padding: 0;
+    margin: 0;
 }
 
 /* Login Page */
@@ -15,7 +16,7 @@ body {
     text-indent: -9999px;
     width: 191px;
     height: 46px;
-    background-image: url('img/btn_google_signin.png');
+    background-image: url('../../../assets/img/btn_google_signin.png');
     background-size: 191px 46px;
 }
 

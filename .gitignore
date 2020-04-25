@@ -3,6 +3,7 @@
 db.sqlite3
 .idea/
 persephone/media/
+persephone/assets/node_modules/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -3,13 +3,7 @@ from allauth.socialaccount.providers.google.provider import GoogleProvider
 from django import forms
 from django.contrib.sites.shortcuts import get_current_site
 
-from builds.models import Project, GlobalSettings
-
-
-class ProjectCreateForm(forms.ModelForm):
-    class Meta:
-        model = Project
-        fields = '__all__'
+from builds.models import GlobalSettings
 
 
 class GlobalSettingsForm(forms.Form):

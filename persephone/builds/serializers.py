@@ -8,7 +8,7 @@ class DisplayChoiceField(serializers.ChoiceField):
         super().__init__(*args, **kwargs)
         choices = kwargs.pop('choices')
         self.choices_dict = dict(choices)
-        self.inverse_dict = dict(map(reversed, choices))
+        self.inverse_dict = {v: k for k, v in choices}
 
     def to_representation(self, value):
         return self.choices_dict[value]
@@ -27,10 +27,15 @@ class ScreenshotSerializer(serializers.ModelSerializer):
     )
 
     state = DisplayChoiceField(choices=STATE_CHOICES)
+    state_display = serializers.CharField(source='get_state_display', read_only=True)
 
     class Meta:
         model = Screenshot
         fields = '__all__'
+
+
+class FullScreenshotSerializer(ScreenshotSerializer):
+    parent = ScreenshotSerializer()
 
 
 class BuildSerializer(serializers.ModelSerializer):
@@ -44,20 +49,27 @@ class BuildSerializer(serializers.ModelSerializer):
         (Build.STATE_REJECTED, 'rejected'),
         (Build.STATE_FAILED, 'failed'),
         (Build.STATE_SUPERSEDED, 'superseded'),
+        (Build.STATE_FAILING, 'failing'),
     )
 
     project = serializers.PrimaryKeyRelatedField(read_only=True)
     state = DisplayChoiceField(choices=STATE_CHOICES, default=Build.STATE_INITIALIZING)
-    screenshots = ScreenshotSerializer(read_only=True, many=True)
+    state_display = serializers.CharField(source='get_state_display', read_only=True)
 
     class Meta:
         model = Build
         fields = '__all__'
 
 
-class ProjectSerializer(serializers.ModelSerializer):
-    builds = BuildSerializer(read_only=True, many=True)
+class FullBuildSerializer(BuildSerializer):
+    screenshots = FullScreenshotSerializer(read_only=True, many=True)
 
+
+class ProjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
         fields = '__all__'
+
+
+class FullProjectSerializer(ProjectSerializer):
+    builds = BuildSerializer(read_only=True, many=True)

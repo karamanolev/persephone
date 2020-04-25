@@ -12,7 +12,7 @@ SECRET_KEY = 'abmn%s!9mz#-25cnj(9bu+==&334h*%+p@x@@-nvacng$j!mb+'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     'widget_tweaks',
     'rest_framework',
     'builds.apps.BuildsConfig',
+    'persephone',
     # Allauth must come before other apps, as we want to override the templates
     'allauth',
     'allauth.account',

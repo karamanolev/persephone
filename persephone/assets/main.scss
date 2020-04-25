@@ -1,0 +1,143 @@
+@import '~normalize.css/normalize.css';
+
+$light-background: #fff5f8;
+$heavy-background: #7d6b91;
+$highlight: #4b2142;
+$contrast: #0d0b12;
+
+$pt-grid-size: 11px;
+$blue1: lighten($highlight, 5%);
+$blue2: lighten($highlight, 10%);
+$blue3: lighten($highlight, 15%);
+$blue4: lighten($highlight, 20%);
+$blue5: lighten($highlight, 25%);
+//$dark-gray4: darken($highlight, 6%);
+@import '~@blueprintjs/core/src/blueprint.scss';
+@import '~@blueprintjs/icons/lib/css/blueprint-icons.css';
+
+$grid-spacing: $pt-grid-size * 3;
+
+@import "ui/CardGrid.scss";
+@import "ui/Card.scss";
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+#root {
+  min-height: 100%;
+}
+
+#submit {
+  margin-top: $pt-grid-size * 2.4;
+}
+
+.root-login {
+  display: grid;
+  align-items: center;
+  justify-content: center;
+
+  background: linear-gradient(145deg, lighten($highlight, 15%), darken($highlight, 8%));
+
+  > .login-root {
+    background: $light-background;
+    box-shadow: 5px 10px 15px -3px rgba(0, 0, 0, 0.3), 3px 3px 6px -3px rgba(0, 0, 0, 0.8);
+    border-radius: $pt-grid-size / 2;
+    width: $pt-grid-size * 34;
+    padding: $pt-grid-size * 3;
+
+    > .logo {
+      margin-bottom: $pt-grid-size * 3;
+      text-align: center;
+
+      > img {
+        width: $pt-grid-size * 12;
+        height: $pt-grid-size * 12;
+      }
+    }
+  }
+}
+
+.root-navbar {
+  background: linear-gradient(145deg, lighten($highlight, 20%), darken($highlight, 8%));
+
+  display: grid;
+  grid-template-columns: $pt-grid-size * 24 auto;
+
+  > .navbar {
+    background: $highlight;
+
+    > .bp3-menu {
+      background: inherit;
+    }
+
+    > .logo {
+      padding-top: $pt-grid-size * 2;
+      padding-bottom: $pt-grid-size * 2;
+      text-align: center;
+
+      > img {
+        width: $pt-grid-size * 3;
+        height: $pt-grid-size * 3;
+      }
+    }
+  }
+
+  > .main-pane {
+    padding: $grid-spacing;
+  }
+}
+
+.card.project {
+  width: $pt-grid-size * 30;
+  height: $pt-grid-size * 20;
+
+  &.new {
+    color: #005400;
+    text-align: center;
+  }
+}
+
+.builds-table {
+  @extend .bp3-html-table;
+  @extend .bp3-interactive;
+
+  width: 100%;
+
+  > tbody > tr > td {
+    vertical-align: middle;
+  }
+}
+
+.screenshots-card {
+  h3 {
+    margin-top: 0;
+    //margin-bottom: $pt-grid-size / 2;
+  }
+
+  .screenshots {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-column-gap: $pt-grid-size;
+  }
+}
+
+.form-wrapper {
+  max-width: 460px;
+}
+
+.form-error {
+  color: $red1;
+  font-size: 0.9em;
+  margin-top: $pt-grid-size / 4;
+}

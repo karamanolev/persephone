@@ -14,10 +14,14 @@ Including another URLconf
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
 from django.conf.urls import url, include
-from django.contrib import admin
+from django.urls import path, re_path
+
+from persephone import views
 
 urlpatterns = [
-    url(r'^admin/', admin.site.urls),
     url('^accounts/', include('allauth.urls')),
-    url('^', include('builds.urls', namespace='builds')),
+    path('api/v1/login', views.APILogin.as_view(), name='login'),
+    path('api/v1/logout', views.APILogout.as_view(), name='logout'),
+    path('api/v1/', include('builds.urls', namespace='builds')),
+    re_path('.*', views.react_host),
 ]
