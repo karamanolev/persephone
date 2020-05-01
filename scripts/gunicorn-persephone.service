@@ -1,0 +1,17 @@
+[Unit]
+Description=Gunicorn for Persephone
+After=network.target
+
+[Service]
+User=www-data
+Group=www-data
+WorkingDirectory=/opt/persephone/persephone
+ExecStart=/opt/persephone/venv/bin/gunicorn \
+    --access-logfile - \
+    --error-logfile - \
+    --workers 4 \
+    --bind 127.0.0.1:8888 \
+    persephone.wsgi
+
+[Install]
+WantedBy=multi-user.target

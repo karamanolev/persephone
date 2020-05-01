@@ -124,3 +124,6 @@ SOCIALACCOUNT_ADAPTER = 'builds.allauth_adapters.BuildsSocialAccountAdapter'
 SOCIALACCOUNT_EMAIL_VERIFICATION = 'none'
 SOCIALACCOUNT_EMAIL_REQUIRED = True
 SOCIALACCOUNT_QUERY_EMAIL = True
+
+# To disable Celery processing, set to True
+CELERY_TASK_ALWAYS_EAGER = False

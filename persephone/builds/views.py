@@ -165,7 +165,7 @@ class APIBuilds(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         build = serializer.save(project=Project.objects.get(id=self.kwargs['project_id']))
-        transaction.on_commit(lambda: tasks.process_build_created(build.id))
+        transaction.on_commit(lambda: tasks.process_build_created.delay(build.id))
 
 
 class APIBuildDetail(generics.RetrieveUpdateDestroyAPIView):
@@ -186,7 +186,7 @@ class APIBuildFinish(APIView):
             return HttpResponseForbidden()
         build.state = Build.STATE_FINISHING
         build.save()
-        transaction.on_commit(lambda: tasks.process_build_finished(build.id))
+        transaction.on_commit(lambda: tasks.process_build_finished.delay(build.id))
         return Response(BuildSerializer(build).data)
 
 
@@ -199,7 +199,7 @@ class APIBuildFail(APIView):
             return HttpResponseForbidden()
         build.state = Build.STATE_FAILING
         build.save()
-        transaction.on_commit(lambda: tasks.process_build_failed(build.id))
+        transaction.on_commit(lambda: tasks.process_build_failed.delay(build.id))
         return Response(BuildSerializer(build).data)
 
 
@@ -219,7 +219,7 @@ class APIScreenshots(APIView):
             image=request.FILES['image'],
             metadata_json=request.POST.get('metadata'),
         )
-        transaction.on_commit(lambda: tasks.process_screenshot(screenshot.id))
+        transaction.on_commit(lambda: tasks.process_screenshot.delay(screenshot.id))
         return Response(ScreenshotSerializer(screenshot).data)
 
 

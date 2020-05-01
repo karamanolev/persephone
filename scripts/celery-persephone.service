@@ -1,0 +1,16 @@
+[Unit]
+Description=Celery for Persephone
+After=network.target
+
+[Service]
+User=www-data
+Group=www-data
+WorkingDirectory=/opt/persephone/persephone
+ExecStart=/opt/persephone/venv/bin/celery \
+    worker \
+    --app persephone \
+    --concurrency 1 \
+    --loglevel info
+
+[Install]
+WantedBy=multi-user.target
