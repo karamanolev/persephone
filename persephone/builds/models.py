@@ -196,14 +196,14 @@ class Build(models.Model):
         self.state = Build.STATE_PENDING_REVIEW
 
     def finish(self):
-        screenshots = {s.name: s for s in self.screenshots.all()}
+        screenshot_names = {s.name.lower() for s in self.screenshots.all()}
         if self.parent:
-            parent_screenshots = {
-                s.name: s for s in
+            parent_screenshots_map = {
+                s.name.lower(): s for s in
                 self.parent.screenshots.exclude(state=Screenshot.STATE_DELETED)
             }
-            for parent_name, parent_screenshot in parent_screenshots.items():
-                if parent_name not in screenshots:
+            for parent_name, parent_screenshot in parent_screenshots_map.items():
+                if parent_name not in screenshot_names:
                     Screenshot.objects.create(
                         build=self,
                         state=Screenshot.STATE_DELETED,
