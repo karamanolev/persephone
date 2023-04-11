@@ -232,3 +232,17 @@
         })
     </script>
 {% endblock %}
+
+{% block body_end %}
+    <div class="screenshot-console-modal-background">
+        <div class="screenshot-console-modal">
+            <div class="screenshot-console-modal-inner-container">
+                <h2 class="screenshot-console-modal-title">Console Messages</h2>
+                <button type="button" class="close screenshot-console-modal-close-button" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <div class="screenshot-console-entries"></div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
