@@ -151,6 +151,11 @@
                         {{ screenshot.name }}
                         ({{ screenshot.get_state_display }}{% if screenshot.image_diff_amount %}
                         {{ screenshot.image_diff_amount }}{% endif %})
+                        {% if screenshot.metadata.console_log %}
+                            <button class="screenshot-console-button" data-metadata-json="{{ screenshot.metadata_json }}">
+                                <i class="glyphicon glyphicon-list"></i>
+                            </button>
+                        {% endif %}
                     </div>
                     <div class="panel-body">
                         <div class="image image-parent">
@@ -199,6 +204,31 @@
                 $('.uncollapse-screenshots').hide();
                 $('.collapsed-screenshot').slideDown();
             })
+        })
+
+        $('.screenshot-console-button').click(function() {
+            const $entries = $(".screenshot-console-entries");
+            $entries.empty();
+            for (const entry of $(this).data("metadata-json").console_log) { 
+                const date = new Date(entry.timestamp);   
+                const formattedTimestamp = `${date.getFullYear()}/${date.getMonth()}/${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+                $entries.append(
+                    $("<div>")
+                        .addClass(`screenshot-console-entry console-entry-${entry.level.toLowerCase()}`)
+                        .text(`${formattedTimestamp} ${entry.level}: ${entry.message}`)
+                );
+            }
+            $('.screenshot-console-modal-background').addClass('modal-open');
+            $('html, body').css({
+                overflow: 'hidden',
+            });
+        })
+
+        $('.screenshot-console-modal-close-button').click(function() {
+            $('.screenshot-console-modal-background').removeClass('modal-open');
+            $('html, body').css({
+                overflow: 'auto',
+            });
         })
     </script>
 {% endblock %}
