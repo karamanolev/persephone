@@ -147,7 +147,7 @@
         <div class="row {% if screenshot.state == screenshot.STATE_MATCHING %}collapsed-screenshot{% endif %}">
             <div class="col-md-12">
                 <div class="panel panel-default panel-diff">
-                    <div class="panel-heading">
+                    <div class="panel-heading screenshot-panel-heading">
                         {{ screenshot.name }}
                         ({{ screenshot.get_state_display }}{% if screenshot.image_diff_amount %}
                         {{ screenshot.image_diff_amount }}{% endif %})
@@ -205,7 +205,23 @@
                 $('.collapsed-screenshot').slideDown();
             })
         })
+    </script>
+{% endblock %}
 
+{% block body_end %}
+    <div class="screenshot-console-modal-background">
+        <div class="screenshot-console-modal">
+            <div class="screenshot-console-modal-inner-container">
+                <h2 class="screenshot-console-modal-title">Console Messages</h2>
+                <button type="button" class="close screenshot-console-modal-close-button" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <div class="screenshot-console-entries"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>  
         $('.screenshot-console-button').click(function() {
             const $entries = $(".screenshot-console-entries");
             $entries.empty();
@@ -223,26 +239,12 @@
                 overflow: 'hidden',
             });
         })
-
-        $('.screenshot-console-modal-close-button').click(function() {
+        
+        $('.screenshot-console-modal-close-button').click(function(e) {
             $('.screenshot-console-modal-background').removeClass('modal-open');
             $('html, body').css({
                 overflow: 'auto',
             });
         })
     </script>
-{% endblock %}
-
-{% block body_end %}
-    <div class="screenshot-console-modal-background">
-        <div class="screenshot-console-modal">
-            <div class="screenshot-console-modal-inner-container">
-                <h2 class="screenshot-console-modal-title">Console Messages</h2>
-                <button type="button" class="close screenshot-console-modal-close-button" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-                <div class="screenshot-console-entries"></div>
-            </div>
-        </div>
-    </div>
 {% endblock %}
