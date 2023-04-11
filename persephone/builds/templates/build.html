@@ -211,7 +211,7 @@
             $entries.empty();
             for (const entry of $(this).data("metadata-json").console_log) { 
                 const date = new Date(entry.timestamp);   
-                const formattedTimestamp = `${date.getFullYear()}/${date.getMonth()}/${date.getDate()}T${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+                const formattedTimestamp = `${date.getFullYear()}/${date.getMonth()}/${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
                 $entries.append(
                     $("<div>")
                         .addClass(`screenshot-console-entry console-entry-${entry.level.toLowerCase()}`)
