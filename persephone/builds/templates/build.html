@@ -160,19 +160,19 @@
                     <div class="panel-body">
                         <div class="image image-parent">
                             {% if screenshot.parent.image %}
-                                {% url 'builds:screenshot_image' build.parent.project_id build.parent.id screenshot.parent.name as image %}
+                                {% url 'builds:screenshot_image' build.parent.project_id build.parent.id screenshot.parent.id as image %}
                                 <img src="{{ image }}">
                             {% endif %}
                         </div>
                         <div class="image image-diff">
                             {% if screenshot.image_diff %}
-                                {% url 'builds:screenshot_image_diff' build.project_id build.id screenshot.name as image %}
+                                {% url 'builds:screenshot_image_diff' build.project_id build.id screenshot.id as image %}
                                 <img src="{{ image }}">
                             {% endif %}
                         </div>
                         <div class="image image-current">
                             {% if screenshot.image %}
-                                {% url 'builds:screenshot_image' build.project_id build.id screenshot.name as image %}
+                                {% url 'builds:screenshot_image' build.project_id build.id screenshot.id as image %}
                                 <img src="{{ image }}">
                             {% endif %}
                         </div>
@@ -206,9 +206,7 @@
             })
         })
     </script>
-{% endblock %}
 
-{% block body_end %}
     <div class="screenshot-console-modal-background">
         <div class="screenshot-console-modal">
             <div class="screenshot-console-modal-inner-container">

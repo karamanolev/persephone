@@ -127,18 +127,18 @@ def build_action(action):
 
 
 @login_required
-def screenshot_image(request, project_id, build_id, screenshot_name):
+def screenshot_image(request, project_id, build_id, screenshot_id):
     build = Build.objects.get(project_id=project_id, id=build_id)
-    screenshot = build.screenshots.get(name=screenshot_name)
+    screenshot = build.screenshots.get(id=screenshot_id)
     resp = HttpResponse(open(screenshot.image.path, 'rb'), content_type='image/png')
     resp['Cache-Control'] = 'public, max-age=600'
     return resp
 
 
 @login_required
-def screenshot_image_diff(request, project_id, build_id, screenshot_name):
+def screenshot_image_diff(request, project_id, build_id, screenshot_id):
     build = Build.objects.get(project_id=project_id, id=build_id)
-    screenshot = build.screenshots.get(name=screenshot_name)
+    screenshot = build.screenshots.get(id=screenshot_id)
     resp = HttpResponse(open(screenshot.image_diff.path, 'rb'), content_type='image/png')
     resp['Cache-Control'] = 'public, max-age=600'
     return resp

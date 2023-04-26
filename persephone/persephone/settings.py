@@ -127,3 +127,5 @@ SOCIALACCOUNT_QUERY_EMAIL = True
 
 # To disable Celery processing, set to True
 CELERY_TASK_ALWAYS_EAGER = False
+
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
