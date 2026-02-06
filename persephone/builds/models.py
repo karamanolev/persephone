@@ -254,7 +254,7 @@ class Build(models.Model):
 
 
 class Screenshot(models.Model):
-    DIFF_EPSILON = 1e-4
+    DIFF_EPSILON = 2e-4
 
     STATE_PENDING = 0
     STATE_MATCHING = 1
